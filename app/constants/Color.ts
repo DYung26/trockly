@@ -3,7 +3,9 @@ const tintColorDark = '#fff';
 
 
 const textSecondaryLight = '#666';
-const textSecondaryDark = '#999';
+const textSecondaryDark = '#666565';
+const neutralDark = '#726C6C'
+const grey500 = '#6D6D6D';
 
 
 const Colors = {
@@ -19,6 +21,8 @@ const Colors = {
     inputBackground: '#f5f5f5',
     inputBorder: '#ccc',
     label: '#333',
+    neutralDark,
+    grey500
   },
   dark: {
     text: '#fff',
@@ -27,6 +31,8 @@ const Colors = {
     tint: tintColorDark,
     tabIconDefault: '#ccc',
     textSecondary: textSecondaryDark,
+    neutralDark,
+    grey500,
     tabIconSelected: tintColorDark,
     button: '#007AFF',
     buttonText: '#fff',

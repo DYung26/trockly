@@ -3,7 +3,7 @@ import { Text, TextProps, StyleProp, TextStyle } from 'react-native';
 import { useTheme } from '../providers/ThemeProviders';
 import Colors from '../constants/Color';
 
-type Variant = 'heading' | 'subheading' | 'body' | 'caption';
+type Variant = 'heading' | 'subheading' | 'body' | 'caption' | 'description' | 'neutrals' | 'grey';
 
 interface ThemedTextProps extends TextProps {
   variant?: Variant;
@@ -21,10 +21,13 @@ const ThemedText: React.FC<ThemedTextProps> = ({
   const colors = Colors[themeKey]; 
 
   const textStyle = {
-    heading: { fontSize: 24, fontWeight: 'bold' as const, color: colors.text },
+    heading: { fontSize: 24, fontWeight: '700' as const, color: colors.text },
     subheading: { fontSize: 14, fontWeight: '600' as const, color: colors.text },
-    body: { fontSize: 16, fontWeight: 'normal' as const, color: colors.text},
-    caption: { fontSize: 12, color: colors.textSecondary },
+    body: { fontSize: 16, fontWeight: '700' as const, color: colors.text},
+    caption: { fontSize: 12, fontWeight: '300' as const, color: colors.textSecondary },
+    description: { fontSize: 16, fontWeight: '400' as const, color: colors.text},
+    neutrals: { fontSize: 12, fontWeight: '400' as const, color: colors.neutralDark},
+    grey: { fontSize: 12, fontWeight: '300' as const, color: colors.grey500}  
   };
 
   return (

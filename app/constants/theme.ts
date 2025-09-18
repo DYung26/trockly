@@ -6,5 +6,20 @@ export const colors = {
   white: "#FFFFFF",
   gray: "#9CA3AF",
   error: "#EF4444", 
+  black: '#000000',
+  nationBlue: '#509BFF',
+  lightBlue: '#509BFF',
+  lightGrey: '#535353',
+  darkGray: '#666565',
+  shadowWhite: '#FAFAFA',
+  deepWhite: '#CCCBCB',
+  baseBlack: '#0A0A0B',
+  setBlue: '#007FFF',
+  lightGray: '#D9D9D9',
+  Neutrals600: '#726C6C',
+  whiteItem: '#f3f4f6',
+  blue100: '#D7E7FF',
+  grey300: '#B0B0B0',
+  grey900: '#3D3D3D'
 }
 
