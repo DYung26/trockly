@@ -18,7 +18,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#174359",
-        "foregroundImage": "./assets/images/trocklyLogo.png"
+        "foregroundImage": "./assets/images/trockly-splash.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
@@ -32,10 +32,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/trocklyLogo.png",
+          "image": "./assets/images/trockly-splash.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#3C3C3C",
+          "backgroundColor": "#F1F1F1",
           "dark": {
             "backgroundColor": "#000000"
           }

@@ -1,23 +1,23 @@
-export const radius = {
-  xl: 16,
-  lg: 12,
-  md: 10,
-  xmd: 24,
-  sm: 8,
-  lmd: 29,
-  xl6: 60,
-  xxl: 80,
-};
+export const BORDER_RADIUS = {
+  sm: 4,
+  md: 6,
+  lg: 8,
+  xl: 12,
+  '2xl': 16,
+  '3xl': 24,
+  '4xl': 30,
+  full: 9999,
+} as const;
 
-export const spacing = {
-  xs: 6,
-  sm: 10,
-  md: 14,
-  flg: 16,
-  lg: 20,
-  xl: 28,
-  sxl: 30,
-  xxl: 36,
-  xfxl: 40,
-  xxxl: 50,
-};
+
+export const SPACING = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  '2xl': 24,
+  '3xl': 30,
+  '4xl': 40,
+  '5xl': 60,
+} as const;

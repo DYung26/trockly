@@ -1,277 +1,233 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
-  TextInput,
-  StatusBar,
-  Modal,
-  FlatList,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BORDER_RADIUS, SPACING } from '../constants/layout';
 import { colors } from '../constants/theme';
-import Input from '../reusables/Input';
-import { useRouter } from 'expo-router';
-import { radius, spacing } from '../constants/layout';
+import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
+import { CustomInput } from '../reusables/CustomInput';
+import DividerWithText from '../reusables/DividerLine';
 import ThemedText from '../reusables/ThemedText';
+import AuthButton from '../reusables/AuthButton';
 
-type SignUpMethod = 'email' | 'phone';
-
-interface Country {
-  code: string;
-  name: string;
-  flag: string;
-  dialCode: string;
+interface ValidationErrors {
+  password?: string;
+  confirmPassword?: string;
 }
 
-const countries: Country[] = [
-  { code: 'NG', name: 'Nigeria', flag: '🇳🇬', dialCode: '+234' },
-  { code: 'US', name: 'United States', flag: '🇺🇸', dialCode: '+1' },
-  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', dialCode: '+44' },
-  { code: 'CA', name: 'Canada', flag: '🇨🇦', dialCode: '+1' },
-  { code: 'AU', name: 'Australia', flag: '🇦🇺', dialCode: '+61' },
-  { code: 'DE', name: 'Germany', flag: '🇩🇪', dialCode: '+49' },
-  { code: 'FR', name: 'France', flag: '🇫🇷', dialCode: '+33' },
-  { code: 'IN', name: 'India', flag: '🇮🇳', dialCode: '+91' },
-  { code: 'CN', name: 'China', flag: '🇨🇳', dialCode: '+86' },
-  { code: 'JP', name: 'Japan', flag: '🇯🇵', dialCode: '+81' },
-  { code: 'KR', name: 'South Korea', flag: '🇰🇷', dialCode: '+82' },
-  { code: 'BR', name: 'Brazil', flag: '🇧🇷', dialCode: '+55' },
-  { code: 'MX', name: 'Mexico', flag: '🇲🇽', dialCode: '+52' },
-  { code: 'ZA', name: 'South Africa', flag: '🇿🇦', dialCode: '+27' },
-  { code: 'EG', name: 'Egypt', flag: '🇪🇬', dialCode: '+20' },
-  { code: 'KE', name: 'Kenya', flag: '🇰🇪', dialCode: '+254' },
-  { code: 'GH', name: 'Ghana', flag: '🇬🇭', dialCode: '+233' },
-  { code: 'AE', name: 'UAE', flag: '🇦🇪', dialCode: '+971' },
-  { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦', dialCode: '+966' },
-  { code: 'TR', name: 'Turkey', flag: '🇹🇷', dialCode: '+90' },
-];
-
-interface SignUpScreenProps {
-  onSubmit?: (method: SignUpMethod, value: string) => void;
-}
-
-const SignUpScreen: React.FC<SignUpScreenProps> = ({
-  onSubmit,
-}) => {
+const SignupScreen: React.FC = () => {
   const router = useRouter();
-  const [selectedMethod, setSelectedMethod] = useState<SignUpMethod>('email');
-  const [email, setEmail] = useState<string>('');
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const [isChecked, setIsChecked] = useState<boolean>(false);
-  const [selectedCountry, setSelectedCountry] = useState<Country>(countries[0]); 
-  const [showCountryPicker, setShowCountryPicker] = useState<boolean>(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
-  const handleSubmit = () => {
-    const value = selectedMethod === 'email' ? email : `${selectedCountry.dialCode}${phoneNumber}`;
-    if (value.trim() && isChecked) {
-      onSubmit?.(selectedMethod, value);
-      console.log(`Submitting ${selectedMethod}:`, value);
+  const validatePasswords = () => {
+    const errors: ValidationErrors = {};
+    
+    if (password && confirmPassword && password !== confirmPassword) {
+      errors.confirmPassword = 'Password do not match';
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const isSignupEnabled = () => {
+    return (
+      email.trim() !== '' &&
+      password.trim() !== '' &&
+      confirmPassword.trim() !== '' &&
+      agreeToTerms &&
+      password === confirmPassword
+    );
+  };
+
+  const handleConfirmPasswordBlur = () => {
+    if (confirmPassword) {
+      validatePasswords();
     }
   };
 
-  const selectCountry = (country: Country) => {
-    setSelectedCountry(country);
-    setShowCountryPicker(false);
-  };
-
-  const renderCountryItem = ({ item }: { item: Country }) => (
-    <TouchableOpacity
-      style={styles.countryItem}
-      onPress={() => selectCountry(item)}
-    >
-      <Text style={styles.countryFlag}>{item.flag}</Text>
-      <View style={styles.countryInfo}>
-        <Text style={styles.countryName}>{item.name}</Text>
-        <Text style={styles.countryDialCode}>{item.dialCode}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const isValidEmail = (email: string) => {
-    return email.includes('@') && email.includes('.');
-  };
-
-  const isFormValid = () => {
-    if (!isChecked) return false;
-    if (selectedMethod === 'email') {
-      return isValidEmail(email);
-    } else {
-      return phoneNumber.trim().length > 0;
+  const handleCreateAccount = async () => {
+    if (!validatePasswords()) return;
+    
+    setIsLoading(true);
+    try {
+      // Add your signup logic here
+      console.log('Creating account...');
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      router.push('/auth/OTPVerification');
+    } catch (error) {
+      console.error('Signup error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const getButtonText = () => {
-    return selectedMethod === 'email' ? 'Send Magic Link' : 'Send Verification Code';
-  };
-
-  const getHelpText = () => {
-    return selectedMethod === 'email' 
-      ? "We'll send you a magic link to sign in"
-      : "We'll send you a verification code via SMS";
-  };
-
-  const onBack = () => {
-    router.back();
-  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <ThemedText style={styles.backArrow}>←</ThemedText>
-        </TouchableOpacity>
-      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Logo */}
+          <View style={styles.logoContainer}>
+           <Image 
+             source={require('../../assets/images/mask-group.png')}
+             style={styles.logoImage}
+           />
+           <ThemedText variant='h1'>Welcome to Trockly</ThemedText>
+          </View>
 
-      {/* Content */}
-      <View style={styles.content}>
-        <ThemedText variant='heading' style={styles.title}>Join Trocky</ThemedText>
-        <ThemedText variant='description' style={styles.subtitle}>Choose your preferred way to sign up</ThemedText>
-
-        {/* Method Selection Tabs */}
-        <View style={styles.methodTabs}>
-          <TouchableOpacity 
-            style={[
-              styles.methodTab, 
-              selectedMethod === 'email' && styles.methodTabActive
-            ]}
-            onPress={() => setSelectedMethod('email')}
-          >
-            <Text style={[
-              styles.methodTabText,
-              selectedMethod === 'email' && styles.methodTabTextActive
-            ]}>
-              Email
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.methodTab, 
-              selectedMethod === 'phone' && styles.methodTabActive
-            ]}
-            onPress={() => setSelectedMethod('phone')}
-          >
-            <Text style={[
-              styles.methodTabText,
-              selectedMethod === 'phone' && styles.methodTabTextActive
-            ]}>
-              Phone Number
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Dynamic Input Section */}
-        <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>
-            {selectedMethod === 'email' ? 'Email' : 'Phone Number'}
-          </Text>
-          
-          {selectedMethod === 'email' ? (
-            <Input
-              style={styles.emailInput}
+          {/* Form Card */}
+          <View style={styles.formCard}>
+            {/* Email Input */}
+            <View style={styles.inputContainer}>
+             <CustomInput
+              label="Email"
+              placeholder="E.g golibefelath@gmail.com"
               value={email}
               onChangeText={setEmail}
-              placeholder="Enter your email"
-              placeholderTextColor={colors.lightGray}
               keyboardType="email-address"
               autoCapitalize="none"
-              autoCorrect={false}
-            />
-          ) : (
-            <View style={styles.phoneInputContainer}>
-              <TouchableOpacity 
-                style={styles.countryCodeContainer}
-                onPress={() => setShowCountryPicker(true)}
-              >
-                <Text style={styles.flag}>{selectedCountry.flag}</Text>
-                <Text style={styles.countryCode}>{selectedCountry.dialCode}</Text>
-                <Text style={styles.dropdownArrow}>▼</Text>
-              </TouchableOpacity>
-              
-              <TextInput
-                style={styles.phoneInput}
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                placeholder="Phone Number"
-                placeholderTextColor={colors.lightGray}
-                keyboardType="phone-pad"
-                maxLength={15}
+             />
+            </View>
+
+            {/* Password Input */}
+            <View style={styles.inputContainer}>
+              <CustomInput
+                label="Password"
+                placeholder="Enter password"
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                rightIcon={
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Ionicons
+                     name={showPassword ? 'eye' : 'eye-off'}
+                     size={20}
+                     color="#777A84"
+                    />
+                  </TouchableOpacity>
+                }
               />
             </View>
-          )}
-          
-          <ThemedText variant='neutrals' style={styles.helpText}>{getHelpText()}</ThemedText>
-        </View>
 
-        {/* Terms and Privacy */}
-        <View style={styles.termsContainer}>
-          <TouchableOpacity 
-            style={styles.checkbox}
-            onPress={() => setIsChecked(!isChecked)}
-          >
-            <View style={[styles.checkboxBox, isChecked && styles.checkboxBoxChecked]}>
-              {isChecked && <Text style={styles.checkmark}>✓</Text>}
+            {/* Confirm Password Input */}
+            <View style={styles.inputContainer}>
+             <CustomInput
+              label="Confirm Password"
+              placeholder="Enter password"
+              value={confirmPassword}
+              onChangeText={(text) => {
+                setConfirmPassword(text);
+                if (validationErrors.confirmPassword) {
+                  setValidationErrors({});
+                }
+              }}
+              onBlur={handleConfirmPasswordBlur}
+              isPassword
+              error={validationErrors.confirmPassword}
+              secureTextEntry={!showConfirmPassword}
+                rightIcon={
+                  <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <Ionicons
+                     name={showConfirmPassword ? 'eye' : 'eye-off'}
+                     size={20}
+                     color="#777A84"
+                    />
+                  </TouchableOpacity>
+                }
+             />
             </View>
-          </TouchableOpacity>
-          
-          <Text style={styles.termsText}>
-            By registering you agree to our{' '}
-            <Text style={styles.linkText}>terms of service</Text> &{' '}
-            <Text style={styles.linkText}>privacy policy</Text>
-          </Text>
-        </View>
-      </View>
 
-      {/* Submit Button */}
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          style={[
-            styles.submitButton,
-            !isFormValid() && styles.submitButtonDisabled
-          ]}
-          onPress={handleSubmit}
-          disabled={!isFormValid()}
-        >
-          <Text style={[
-            styles.submitButtonText,
-            !isFormValid() && styles.submitButtonTextDisabled
-          ]}>
-            {getButtonText()}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Country Picker Modal */}
-      <Modal
-        visible={showCountryPicker}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
+            {/* Terms and Conditions Checkbox */}
             <TouchableOpacity
-              onPress={() => setShowCountryPicker(false)}
-              style={styles.modalCloseButton}
+              style={styles.checkboxContainer}
+              onPress={() => setAgreeToTerms(!agreeToTerms)}
+              activeOpacity={0.7}
             >
-              <Text style={styles.modalCloseText}>Cancel</Text>
+              <View style={[styles.checkbox, agreeToTerms && styles.checkboxChecked]}>
+                {agreeToTerms && <Text style={styles.checkmark}>✓</Text>}
+              </View>
+              <Text style={styles.checkboxText}>
+                I agree to{' '}
+                <Text style={styles.linkText}>Terms of service</Text>
+                {' '}and{' '}
+                <Text style={styles.linkText}>forbidden category policy</Text>
+              </Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>Select Country</Text>
-            <View style={styles.modalPlaceholder} />
+
+            {/* Create Account Button */}
+            <AuthButton
+               title="Create an account"
+               onPress={handleCreateAccount}
+               disabled={!isSignupEnabled() || isLoading}
+               loading={isLoading}
+               style={[
+                styles.createButton,
+                isSignupEnabled() && styles.createButtonActive
+               ]}
+               textStyle={[
+                styles.createButtonText,
+                isSignupEnabled() && styles.createButtonTextActive
+               ]}
+            />
+
+            {/* Explore as Guest */}
+            <TouchableOpacity style={styles.guestButton}>
+              <Text style={styles.guestButtonText}>
+                Explore as guest <Text style={styles.arrow}>→</Text>
+              </Text>
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <DividerWithText text="or create an account with" />
+
+            {/* Social Login Buttons */}
+            <View style={styles.socialButtonsContainer}>
+              <TouchableOpacity style={styles.socialButton}>
+               <Image 
+                 source={require('../../assets/images/google-img.png')}
+               />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <Image 
+                  source={require('../../assets/images/apple-img.png')}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Login Link */}
+            <View style={styles.loginContainer}>
+              <ThemedText variant='h6'>Already have an account?</ThemedText>
+              <TouchableOpacity onPress={() => router.push('/auth/login')}>
+                <ThemedText variant='caption'>Log In</ThemedText>
+              </TouchableOpacity>
+            </View>
           </View>
-          
-          <FlatList
-            data={countries}
-            renderItem={renderCountryItem}
-            keyExtractor={(item) => item.code}
-            style={styles.countryList}
-          />
-        </SafeAreaView>
-      </Modal>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -279,256 +235,133 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surfacePrimary,
   },
-  header: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  backButton: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: radius.xxl,
-    backgroundColor: colors.shadowWhite,
-    borderWidth: 1,
-    borderColor: colors.deepWhite
-  },
-  backArrow: {
-    fontSize: 20,
-    color: colors.baseBlack,
-  },
-  content: {
+  keyboardView: {
     flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
   },
-  title: {
-    marginBottom: 20,
-    textAlign: 'center',
-    fontFamily: "SpaceGrotesk_700Bold",
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: SPACING.xl,
   },
-  subtitle: {
-    textAlign: 'center',
-    marginBottom: 32,
-    fontFamily: "SpaceGrotesk_700Bold",
-  },
-  methodTabs: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
-  },
-  methodTab: {
-    flex: 1,
-    paddingVertical: radius.lg,
-    paddingHorizontal: spacing.flg,
-    borderRadius: radius.sm,
+  logoContainer: {
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#8D8E8F'
+    marginTop: SPACING['5xl'],
+    marginBottom: SPACING['4xl'],
   },
-  methodTabActive: {
-    backgroundColor: colors.nationBlue,
-    borderColor: colors.lightBlue,
+ logoImage: {
+  width: 146.87,
+  height: 32,
+ },
+  formCard: {
+    backgroundColor: colors.surfacePage,
+    paddingHorizontal: SPACING['2xl'],
+    paddingTop: SPACING['3xl'],
+    paddingBottom: SPACING['4xl'],
+    marginHorizontal: SPACING.md,
+    borderRadius: BORDER_RADIUS.xl,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 5,
   },
-  methodTabText: {
-    color: colors.black,
-    fontSize: 14,
-    fontWeight: '400',
-    fontFamily: "SpaceGrotesk_700Bold",
+  inputContainer: {
+    marginBottom: SPACING.xl,
   },
-  methodTabTextActive: {
-    color: colors.white,
-    fontFamily: "SpaceGrotesk_700Bold",
-  },
-  inputSection: {
-    marginBottom: 32,
-  },
-  inputLabel: {
-    fontSize: 14,
-    color: colors.black,
-    fontWeight: '500',
-    marginBottom: 12,
-    fontFamily: "SpaceGrotesk_700Bold",
-  },
-  emailInput: {
-    paddingHorizontal: spacing.flg,
-    paddingVertical: spacing.md,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: colors.setBlue,
-    fontFamily: "SpaceGrotesk_700Bold",
-    borderRadius: radius.sm,
-    backgroundColor: colors.white,
-    color: colors.black,
-    marginBottom: 8,
-  },
-  phoneInputContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 8,
-  },
-  countryCodeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.flg,
-    paddingVertical: spacing.md,
-    backgroundColor:  colors.white,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.lightBlue,
-    gap: 8,
-  },
-  flag: {
-    fontSize: 18,
-  },
-  countryCode: {
-    fontSize: 16,
-    color: colors.black,
-    fontWeight: '400',
-  },
-  dropdownArrow: {
-    fontSize: 10,
-    color: '#6b7280',
-  },
-  phoneInput: {
-    flex: 1,
-    paddingHorizontal: spacing.flg,
-    paddingVertical: spacing.md,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: colors.setBlue,
-    borderRadius: radius.sm,
-    backgroundColor: colors.white,
-    color: colors.lightGray,
-  },
-  helpText: {
-    marginTop: 8,
-    fontFamily: "SpaceGrotesk_700Bold",
-  },
-  termsContainer: {
+  checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 12,
+    marginBottom: SPACING['2xl'],
+    paddingRight: SPACING.sm,
   },
   checkbox: {
-    marginTop: 2,
-  },
-  checkboxBox: {
     width: 20,
     height: 20,
-    borderRadius: radius.sm,
-    borderWidth: 2,
-    borderColor: colors.Neutrals600,
-    justifyContent: 'center',
-    fontFamily: "SpaceGrotesk_700Bold",
+    borderRadius: BORDER_RADIUS.sm,
+    borderWidth: 1,
+    borderColor: colors.borderColor,
+    marginRight: SPACING.md,
+    marginTop: 2,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  checkboxBoxChecked: {
-    backgroundColor: colors.nationBlue,
-    borderColor: colors.lightBlue,
+  checkboxChecked: {
+    backgroundColor: colors.priBlue,
   },
   checkmark: {
     color: colors.white,
-    fontSize: 12,
+    fontSize: FONT_SIZES.base,
     fontWeight: 'bold',
   },
-  termsText: {
+  checkboxText: {
     flex: 1,
-    fontSize: 14,
-    color: colors.Neutrals600,
-    fontFamily: "SpaceGrotesk_700Bold",
+    fontSize: FONT_SIZES.xs,
+    color: colors.textDisabled,
+    fontWeight: FONT_WEIGHTS.normal,
+    fontFamily: 'Poppins_500Medium',
     lineHeight: 20,
   },
   linkText: {
-    color: colors.nationBlue,
-    textDecorationLine: 'underline',
-    fontFamily: "SpaceGrotesk_700Bold",
+    color: colors.blue,
+    fontWeight: FONT_WEIGHTS.normal,
   },
-  bottomContainer: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sxl,
-  },
-  submitButton: {
-    backgroundColor: colors.nationBlue,
-    paddingVertical: spacing.flg,
-    borderRadius: radius.md,
+  createButton: {
+    backgroundColor: '#E8E8EA',
+    borderRadius: 8,
+    paddingVertical: 16,
     alignItems: 'center',
+    marginBottom: 16,
   },
-  submitButtonDisabled: {
-    backgroundColor: '#e5e7eb',
+  createButtonActive: {
+    backgroundColor: '#4461F2',
   },
-  submitButtonText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: '700',
-    fontFamily: "SpaceGrotesk_700Bold",
-  },
-  submitButtonTextDisabled: {
-    color: '#9ca3af',
-    fontFamily: "SpaceGrotesk_700Bold",
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: colors.white,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  modalCloseButton: {
-    padding: 5,
-  },
-  modalCloseText: {
+  createButtonText: {
+    color: '#9CA3AF',
     fontSize: 16,
-    color: colors.nationBlue,
-    fontWeight: '500',
+    fontWeight: '600',
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.black,
+  createButtonTextActive: {
+    color: '#FFFFFF',
   },
-  modalPlaceholder: {
-    width: 60,
-  },
-  countryList: {
-    flex: 1,
-  },
-  countryItem: {
-    flexDirection: 'row',
+  guestButton: {
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.whiteItem,
+    marginBottom: SPACING.xl,
   },
-  countryFlag: {
-    fontSize: 24,
-    marginRight: 15,
+  guestButtonText: {
+     color: colors.blue,
+    fontSize: FONT_SIZES.base,
+    fontWeight: FONT_WEIGHTS.normal,
+    fontFamily: 'Poppins_500Medium',
+    textDecorationLine: 'underline'
   },
-  countryInfo: {
-    flex: 1,
+  arrow: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: 'Poppins_500Medium',
+    marginLeft: 8,
+    color: colors.blue,
+  },
+  socialButtonsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 16,
+    marginBottom: SPACING['2xl'],
+  },
+  socialButton: {
+   width: 107,
+    height: 49,
+    borderWidth: 1,
+    borderColor: '#BBBDC0',
+    borderRadius: BORDER_RADIUS.lg,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  countryName: {
-    fontSize: 16,
-    color: colors.black,
-    fontWeight: '500',
-  },
-  countryDialCode: {
-    fontSize: 16,
-    color: colors.darkGray,
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
-export default SignUpScreen;
+export default SignupScreen;

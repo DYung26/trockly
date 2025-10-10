@@ -2,8 +2,21 @@ import React from 'react';
 import { Text, TextProps, StyleProp, TextStyle } from 'react-native';
 import { useTheme } from '../providers/ThemeProviders';
 import Colors from '../constants/Color';
+import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
+import { SPACING } from '../constants/layout';
 
-type Variant = 'heading' | 'subheading' | 'body' | 'caption' | 'description' | 'neutrals' | 'grey';
+type Variant =
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'subheading'
+  | 'body'
+  | 'caption'
+  | 'instructions'
+  | 'description'
 
 interface ThemedTextProps extends TextProps {
   variant?: Variant;
@@ -18,20 +31,87 @@ const ThemedText: React.FC<ThemedTextProps> = ({
   ...rest
 }) => {
   const { theme: themeKey } = useTheme();
-  const colors = Colors[themeKey]; 
+  const colors = Colors[themeKey];
 
-  const textStyle = {
-    heading: { fontSize: 24, fontWeight: '700' as const, color: colors.text },
-    subheading: { fontSize: 14, fontWeight: '600' as const, color: colors.text },
-    body: { fontSize: 16, fontWeight: '700' as const, color: colors.text},
-    caption: { fontSize: 12, fontWeight: '300' as const, color: colors.textSecondary },
-    description: { fontSize: 16, fontWeight: '400' as const, color: colors.text},
-    neutrals: { fontSize: 12, fontWeight: '400' as const, color: colors.neutralDark},
-    grey: { fontSize: 12, fontWeight: '300' as const, color: colors.grey500}  
+  const textStyles: Record<Variant, TextStyle> = {
+    h1: {
+      fontSize: FONT_SIZES['2xl'],
+      fontFamily: 'Poppins_700Bold',
+      color: colors.text,
+      lineHeight: 40,
+      fontWeight: FONT_WEIGHTS.bold
+    },
+    h2: {
+      fontSize: FONT_SIZES['3xl'],
+      fontFamily: 'Poppins_600SemiBold',
+      color: colors.text,
+      lineHeight: 32,
+    },
+    h3: {
+      fontSize: FONT_SIZES.xs,
+      fontFamily: 'Poppins_500Medium',
+      color: colors.label,
+      lineHeight: 28,
+      fontWeight: FONT_WEIGHTS.normal
+    },
+    h4: {
+      fontSize: FONT_SIZES.xs,
+      color: colors.buttonText,
+      fontWeight: FONT_WEIGHTS.normal,
+      fontFamily: 'Poppins_500Medium',
+      marginRight: 8,
+    },
+    h5: {
+    color: colors.lightGreen,
+    textDecorationLine: 'underline',
+    fontWeight: FONT_WEIGHTS.normal,
+    fontFamily: 'Poppins_500Medium',
+    fontSize: FONT_SIZES.base,
+    },
+    h6: {
+    color: colors.textSecondaryDark,
+    fontWeight: FONT_WEIGHTS.normal,
+    fontSize: FONT_SIZES.base,
+    fontFamily: 'Poppins_500Medium'
+    },
+    subheading: {
+      fontSize: FONT_SIZES.lg,
+      fontFamily: 'Poppins_700Bold',
+      color: colors.text,
+      fontWeight: FONT_WEIGHTS.bold,
+    },
+    body: {
+      fontSize: FONT_SIZES.lg,
+      fontFamily: 'Poppins_400Regular',
+      color: colors.text,
+      lineHeight: 24,
+    },
+    caption: {
+      color: colors.textBlue,
+       fontSize: 14,
+    fontWeight: FONT_WEIGHTS.normal,
+    fontFamily: 'Poppins_500Medium',
+    textDecorationLine: 'underline'
+    },
+    instructions: {
+     fontSize: FONT_SIZES.base,
+     color: colors.textSecondaryDark,
+     textAlign: 'center',
+     marginBottom: SPACING['3xl'],
+     lineHeight: 22,
+    },
+    description: {
+     fontSize: FONT_SIZES.base,
+     color: colors.buttonText,
+     textAlign: 'center',
+     lineHeight: 22,
+     paddingHorizontal: SPACING.lg,
+     marginTop: 5,
+    }
   };
 
   return (
-    <Text style={[textStyle[variant], style]} {...rest}>
+    <Text style={[textStyles[variant], style]} {...rest}>
       {children}
     </Text>
   );
