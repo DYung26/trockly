@@ -1,27 +1,40 @@
-import { 
-  View, 
-  StyleSheet
+
+import {
+  View,
+  TouchableOpacity,
+
 } from 'react-native';
 import ThemedText from './reusables/ThemedText';
+import { useRouter } from 'expo-router';
 
 
-export default function SplashScreen() {
+
+
+const OnboardingScreen: React.FC = () => {
+  const router = useRouter();
+
+
   
-    return (
-      <View style={styles.container}>
-        <ThemedText variant='body' >Welcome to Truckly App</ThemedText>
-      </View>
-    );
-}
+
+  const handleCreateAccount = () => {
+   router.push('/auth/login');
+  };
 
 
-const styles = StyleSheet.create({
-  container: {
-   flex: 1,
-   justifyContent: 'center',
-   alignItems: 'center'
-  },
-  title: {
-    
-  }
-})
+
+
+
+  return (
+  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+       <TouchableOpacity
+            
+            onPress={handleCreateAccount}
+          >
+            <ThemedText variant='h2'>Create account</ThemedText>
+          </TouchableOpacity>
+  </View>
+  );
+};
+
+
+export default OnboardingScreen;

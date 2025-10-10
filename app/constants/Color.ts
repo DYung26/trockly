@@ -2,37 +2,47 @@ const tintColorLight = '#2f95dc';
 const tintColorDark = '#fff';
 
 
-const textSecondaryLight = '#666';
-const textSecondaryDark = '#999';
+const textBlue = '#3247D5';
+const textSecondaryDark = '#777A84';
+const neutralDark = '#726C6C'
+const grey500 = '#6D6D6D';
+const lightGreen = '#729B27';
 
 
 const Colors = {
   light: {
-    text: '#000',
+    text: '#383A40',
     background: '#fff',
     tint: tintColorLight,
-    textSecondary: textSecondaryLight,
+    textBlue,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
     button: '#007AFF',
-    buttonText: '#fff',
+    buttonText: '#555965',
     inputBackground: '#f5f5f5',
     inputBorder: '#ccc',
-    label: '#333',
+    label: '#383A40',
+    textSecondaryDark,
+    lightGreen,
+    neutralDark,
+    grey500
   },
   dark: {
-    text: '#fff',
+    text: '#383A40',
     textDrak: '#000',
     background: '#000',
     tint: tintColorDark,
     tabIconDefault: '#ccc',
-    textSecondary: textSecondaryDark,
+    textSecondaryDark,
+    neutralDark,
+    grey500,
+    textBlue,
     tabIconSelected: tintColorDark,
     button: '#007AFF',
     buttonText: '#fff',
     inputBackground: '#333',
-    inputBorder: '#555',
     label: '#fff',
+    lightGreen
   },
 } as const; 
 

@@ -1,10 +1,21 @@
 export const colors = {
-   primary: "#174359", 
-  secondary: "#FFB703", 
-  background: "#F9FAFB",
-  text: "#1E1E1E",
-  white: "#FFFFFF",
-  gray: "#9CA3AF",
-  error: "#EF4444", 
+  surfacePrimary: '#D2DBF0',
+  surfacePage: '#F1F1F1',
+  white: '#FFFFFF',
+  deepBlue: '#2B3267',
+  surfaceDisabled: '#DDDEE0',
+  blue: '#3247D5',
+    black: '#000000',
+     textPrimary: '#4F535A',
+  textSecondary: '#6B7280',
+  priBlue: '#39417C',
+   primary: '#4461F2',
+  textDisabled: '#777A84',
+  greyWhite: '#EFEEF0',
+  borderColor: '#BBBDC0',
+  shadeWhite: '#E2E8F0',
+   buttonDisabled: '#E8E8EA',
+  buttonDisabledText: '#9CA3AF',
+  red: '#A33132'
 }
 
