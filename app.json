@@ -13,7 +13,11 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Trockly needs access to your photo library to let you upload a profile picture.",
+        "NSCameraUsageDescription": "Trockly may need camera access if you want to take a new profile photo."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +25,13 @@
         "foregroundImage": "./assets/images/trockly-splash.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA"
+      ]
     },
     "web": {
       "output": "static",
@@ -41,7 +51,14 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+    [
+      "expo-image-picker",
+      {
+      "photosPermission": "Trockly needs access to your photos to upload your profile picture.",
+      "cameraPermission": "Trockly needs camera access to take profile photos."
+    }
+    ]
     ],
     "experiments": {
       "typedRoutes": true,

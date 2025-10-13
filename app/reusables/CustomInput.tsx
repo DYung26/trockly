@@ -17,6 +17,9 @@ interface CustomInputProps extends TextInputProps {
  secureText?: boolean;
  rightIcon?: React.ReactNode;
  isPassword?: boolean;
+ prefix?: string;
+ multiline?: boolean;
+ numberOfLines?: number;
 }
 
 
@@ -27,6 +30,9 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   rightIcon,
   style,
  isPassword = false,
+ prefix,
+ multiline = false,
+ numberOfLines = 1,
   ...props 
 }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,11 +42,21 @@ export const CustomInput: React.FC<CustomInputProps> = ({
    <View style={styles.container}>
      <ThemedText variant='h3'>{label}</ThemedText>
 
-     <View style={[styles.inputWrapper, error && styles.inputError]}>
+     <View 
+      style={[
+        styles.inputWrapper,
+        multiline && styles.textAreaWrapper,
+       error && styles.inputError
+       ]}>
+      {/* Prefix display (if provided) */ }
+      {prefix && <Text style={styles.prefix}>{prefix}</Text>}
+
        <TextInput
          style={[styles.input, style]}
          placeholderTextColor={colors.borderColor}
          secureTextEntry={secureText && !showPassword}
+         numberOfLines={numberOfLines} 
+         textAlignVertical={multiline ? 'top' : 'center'}
          {...props}
        />
 
@@ -70,11 +86,21 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.lg,
     paddingHorizontal: SPACING.lg,
   },
+  textAreaWrapper: {
+   alignItems: 'flex-start',
+  height: 100,
+  textAlignVertical: 'top'
+  },
   input: {
     flex: 1,
     paddingVertical: 14,
     fontSize: FONT_SIZES.md,
-    color: colors.borderColor,
+    color: colors.black
+  },
+  prefix: {
+    fontSize: FONT_SIZES.md,
+    color: colors.textSecondary || '#6B7280',
+    marginRight: 6, 
   },
   iconContainer: {
     paddingLeft: SPACING.sm,
