@@ -16,6 +16,10 @@ export const colors = {
   shadeWhite: '#E2E8F0',
    buttonDisabled: '#E8E8EA',
   buttonDisabledText: '#9CA3AF',
-  red: '#A33132'
+  red: '#A33132',
+  whiteBody: '#F3F4F6',
+  textBody: '#555965',
+  whiteSurface: '#E5E7EB',
+  lightSurface: '#D9D9D9'
 }
 

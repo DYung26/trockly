@@ -6,7 +6,7 @@ export const BORDER_RADIUS = {
   '2xl': 16,
   '3xl': 24,
   '4xl': 30,
-  full: 9999,
+  '5xl': 80,
 } as const;
 
 
@@ -20,4 +20,6 @@ export const SPACING = {
   '3xl': 30,
   '4xl': 40,
   '5xl': 60,
+  '6xl': 80,
+  '7xl': 100  
 } as const;

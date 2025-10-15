@@ -34,6 +34,7 @@ const RootLayout = () => {
         <Stack.Screen name="auth/login" options={{ headerShown: false }} />
         <Stack.Screen name="auth/OTPVerification" options={{ headerShown: false }} />
         <Stack.Screen name="auth/success" options={{ headerShown: false }} />
+        <Stack.Screen name="post-account/onboarding" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

@@ -8,6 +8,7 @@ export const FONT_SIZES = {
   '2xl': 20,
   '3xl': 24,
   '4xl': 32,
+  '5xl': 50,
 } as const;
 
 export const FONT_WEIGHTS = {

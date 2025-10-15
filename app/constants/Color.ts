@@ -7,6 +7,10 @@ const textSecondaryDark = '#777A84';
 const neutralDark = '#726C6C'
 const grey500 = '#6D6D6D';
 const lightGreen = '#729B27';
+const textBody = '#555965';
+const textHeadings = '#383A40';
+const textInformation = '#39417C';
+const lightSurface = '#D9D9D9';
 
 
 const Colors = {
@@ -21,11 +25,15 @@ const Colors = {
     buttonText: '#555965',
     inputBackground: '#f5f5f5',
     inputBorder: '#ccc',
+    lightSurface,
     label: '#383A40',
     textSecondaryDark,
+    textInformation,
     lightGreen,
+    textHeadings,
     neutralDark,
-    grey500
+    grey500,
+    textBody
   },
   dark: {
     text: '#383A40',
@@ -40,9 +48,13 @@ const Colors = {
     tabIconSelected: tintColorDark,
     button: '#007AFF',
     buttonText: '#fff',
+    textInformation,
+    lightSurface,
     inputBackground: '#333',
     label: '#fff',
-    lightGreen
+    lightGreen,
+    textHeadings,
+    textBody
   },
 } as const; 
 

@@ -10,6 +10,8 @@ import {
  ActivityIndicator
 } from 'react-native';
 import { colors } from '../constants/theme';
+import { BORDER_RADIUS, SPACING } from '../constants/layout';
+import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 
 interface AuthButtonProps {
   title: string;
@@ -48,10 +50,10 @@ const AuthButton: React.FC<AuthButtonProps> = ({
 
 const styles = StyleSheet.create({
     button: {
-     borderRadius: 8,
-     paddingVertical: 16,
+     borderRadius: BORDER_RADIUS['5xl'],
+     paddingVertical: SPACING.lg,
      alignItems: 'center',
-     marginBottom: 16,
+     marginBottom: SPACING.lg,
     },
     buttonDisabled: {
       backgroundColor: colors.surfaceDisabled,
@@ -60,8 +62,8 @@ const styles = StyleSheet.create({
       backgroundColor: colors.blue
     },
     text: {
-      fontSize: 16,
-      fontWeight: '600',
+      fontSize: FONT_SIZES.lg,
+      fontWeight: FONT_WEIGHTS.semibold,
     },
     textDisabled: {
      color: colors.textDisabled
@@ -69,8 +71,8 @@ const styles = StyleSheet.create({
     textActive: {
       color: colors.greyWhite,
       fontFamily: 'Poppins_500Medium',
-      fontWeight: '500',
-      fontSize: 14,
+      fontWeight: FONT_WEIGHTS.semibold,
+      fontSize: FONT_SIZES.base,
     },
 });
 

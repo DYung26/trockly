@@ -44,7 +44,7 @@ const LoginScreen: React.FC = () => {
    setIsLoading(true);
    try {
      // Simulate api cals when ready 
-     
+     router.push('/post-account/onboarding')
    } catch(error: any) {
        console.error("Login Error", error);
    } finally {
