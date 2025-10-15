@@ -11,6 +11,7 @@ const textBody = '#555965';
 const textHeadings = '#383A40';
 const textInformation = '#39417C';
 const lightSurface = '#D9D9D9';
+const textAction = '#EFEEF0';
 
 
 const Colors = {
@@ -29,6 +30,7 @@ const Colors = {
     label: '#383A40',
     textSecondaryDark,
     textInformation,
+    textAction,
     lightGreen,
     textHeadings,
     neutralDark,
@@ -50,6 +52,7 @@ const Colors = {
     buttonText: '#fff',
     textInformation,
     lightSurface,
+    textAction,
     inputBackground: '#333',
     label: '#fff',
     lightGreen,

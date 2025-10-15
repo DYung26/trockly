@@ -20,6 +20,7 @@ export const colors = {
   whiteBody: '#F3F4F6',
   textBody: '#555965',
   whiteSurface: '#E5E7EB',
-  lightSurface: '#D9D9D9'
+  lightSurface: '#D9D9D9',
+  primaryBlue: '#7D8BEA'
 }
 

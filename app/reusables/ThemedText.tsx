@@ -34,6 +34,8 @@ type Variant =
   | 'tradeDescription'
   | 'returnOffer'
   | 'tradeText'
+  | 'click'
+  | 'clickDescription'
 
 interface ThemedTextProps extends TextProps {
   variant?: Variant;
@@ -252,6 +254,23 @@ const ThemedText: React.FC<ThemedTextProps> = ({
       fontWeight: FONT_WEIGHTS.normal,
       fontFamily: 'Poppins_400Regular',
       color: colors.buttonText
+    },
+    click: {
+     color: colors.textAction,
+     fontSize: FONT_SIZES['4xl'],
+     fontWeight: FONT_WEIGHTS.bold,
+     fontFamily: 'Poppins_700Bold',
+    lineHeight: 34,
+    marginBottom: 5,
+    paddingHorizontal: 5,
+    },
+    clickDescription: {
+      color: colors.textAction,
+      fontSize: FONT_SIZES.lg,
+      fontWeight: FONT_WEIGHTS.normal,
+      fontFamily: 'Poppins_400Regular',
+      marginBottom: 20,
+      paddingHorizontal: 5,
     }
   };
 
