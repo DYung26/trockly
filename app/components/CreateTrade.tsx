@@ -19,6 +19,7 @@ import { colors } from '../constants/theme';
 import { Trade } from '../types';
 import { CATEGORIES, DAYS  } from '../constants/data';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
+import { useColorScheme } from 'react-native';
 
 interface CreateTradeProps {
   trade: Trade;
@@ -32,6 +33,7 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
  onUpdate, 
  onPreview,
 }) => {
+  const colorScheme = useColorScheme();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [dayOpen, setDayOpen] = useState(false);
   const [timeOpen, setTimeOpen] = useState(false);
@@ -51,7 +53,11 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
-        allowsMultipleSelection: false
+        allowsMultipleSelection: false,
+       // presentationStyle: 'pageSheet',
+        ...(Platform.OS === 'ios' && {
+          videoExportPreset: ImagePicker.VideoExportPreset.HighestQuality,
+        })
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -84,17 +90,15 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
     >
-     <ScrollView
-       contentContainerStyle={styles.scrollContent}
-       showsVerticalScrollIndicator={false}
-       keyboardShouldPersistTaps="handled"
-       nestedScrollEnabled={true}
-     >
-       <View style={styles.screenContainer}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <View style={styles.screenContainer}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         <ThemedText variant='preferenceTitle'>Create a Trade</ThemedText>
         
-        <View style={{ marginTop: 10,}}>
+        <View style={{ marginTop: 10 }}>
             <ThemedText variant='subtitle'>Post what you want to swap with other trackers</ThemedText>
         </View>
 
@@ -142,36 +146,6 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
            maxLength={140}
          />
 
-         {/* --- Add Trade Photos --- */}
-         {/* <View style={styles.inputContainer}>
-           <ThemedText variant='h3'>Add Trade Photos</ThemedText>
-
-           {trade.photos.length === 0 ? (
-             <TouchableOpacity style={styles.uploadBox} onPress={handlePhotoAdd}>
-               <Image 
-                source={require('../../assets/images/sect-action.png')}
-                style={styles.actionIcon}
-              />
-               <ThemedText variant='uploadText'>Upload your images</ThemedText>
-             </TouchableOpacity>
-           ): (
-             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12}}>
-               {trade.photos.map((uri, index) => (
-                 <View key={index} style={styles.photoWrapper}>
-                  <Image source={{ uri }} style={styles.tradePhoto} />
-                  <TouchableOpacity
-                    style={styles.removeButton}
-                    onPress={() => handleRemovePhoto(uri)}
-                  >
-                   <Ionicons name="close" size={18} color={colors.white} />
-                  </TouchableOpacity>
-                 </View>
-               ))}
-             </ScrollView>
-           )}
-           
-         </View> */}
-
         {/* --- Add Trade Photos --- */}
        <View style={styles.inputContainer}>
         <View style={styles.photoHeaderRow}>
@@ -213,7 +187,7 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
   )}
 </View>
 
-         {/* --- Trade Descriotion --- */ }
+         {/* --- Trade Description --- */ }
          <CustomInput
            label="Trade Description"
            value={trade.description}
@@ -238,7 +212,7 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
          <ThemedText variant='inputLabel'>AVAILABILITY</ThemedText>
         <View style={styles.availabilityWrapper}>
          {/* Day Dropdown */}
-         <View style={[styles.availabilityCol, { position: 'relative', zIndex: dayOpen ? 20 : 1 }]}>
+         <View style={styles.availabilityCol}>
            <Text style={styles.availabilityLabel}>Day</Text>
            <TouchableOpacity
              style={styles.dropdownButtonSmall}
@@ -247,7 +221,7 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
                 setTimeOpen(false); 
              }}
            >
-            <Text>
+            <Text style={styles.dropdownText}>
                 {trade.availability.day || 'Select'}
             </Text>
             <Ionicons
@@ -263,7 +237,6 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
                style={styles.dropdownScroll}
                nestedScrollEnabled={true}
                showsVerticalScrollIndicator={true}
-               onStartShouldSetResponderCapture={() => true}
               >
                {DAYS.map((day) => (
                  <TouchableOpacity
@@ -286,7 +259,7 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
          </View>
 
          {/* Time Dropdown */ }
-         <View style={[styles.availabilityCol, { position: 'relative', zIndex: timeOpen ? 20 : 1}]}>
+         <View style={styles.availabilityCol}>
             <Text style={styles.availabilityLabel}>Time</Text>
             <TouchableOpacity
               style={styles.dropdownButtonSmall}
@@ -307,7 +280,6 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
                 style={styles.dropdownScroll}
                 nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={true}
-                onStartShouldSetResponderCapture={() => true}
                >
               {TIMES.map((time) => (
                 <TouchableOpacity
@@ -360,7 +332,6 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
       </View>
       </View>
     </View>
-     </ScrollView>
     </KeyboardAvoidingView>
   );
 };
@@ -373,18 +344,17 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: SPACING.xl,
-    paddingBottom: SPACING.xl,
+    paddingBottom: 100,
   },
   availabilityWrapper: {
    flexDirection: 'row',
    justifyContent: 'space-between',
    gap: 15,
    marginBottom: 25,
-   overflow: 'visible'
   },
   dropdownOverlay: {
    position: 'absolute',
-  top: 55,
+  top: 72,
   left: 0,
   right: 0,
   backgroundColor: colors.white,
@@ -395,13 +365,11 @@ const styles = StyleSheet.create({
   shadowOpacity: 0.15,
   shadowRadius: 6,
   elevation: 20,
-  maxHeight: 220,
+  maxHeight: 160,
   zIndex: 100,
-  overflow: 'hidden',
   },
   dropdownScroll: {
-    maxHeight: 280,
-  zIndex: 200,
+    maxHeight: 160,
   },
   dropdownContainer: {
    marginTop: SPACING.xl,
@@ -439,17 +407,6 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.base,
     color: colors.textBody,
     fontWeight: FONT_WEIGHTS.medium
-  },
-    absoluteDropdown: {
-    position: 'absolute',
-    top: 70,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-    elevation: 10,
-  },
-  scrollableDropdown: {
-   maxHeight: 200,
   },
   inputContainer: {
     marginTop: SPACING.xl,
@@ -541,15 +498,10 @@ const styles = StyleSheet.create({
     marginTop: -15,
     marginBottom: 10,
   },
-  availabilityRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    gap: 15,
-    marginBottom: 20,
-  },
   availabilityCol: {
     flex: 1,
+    position: 'relative',
+    zIndex: 1,
   },
   dropdownButtonSmall: {
     borderWidth: 1,
@@ -561,50 +513,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center'
   },
-  dayCol: {
-    flex: 0.9,
-  },
-  timeCol: {
-    flex: 1.1
-  },
   availabilityLabel: {
     fontSize: 12,
     color: '#6B7280',
     marginBottom: 8,
-  },
-  daysScroll: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingVertical: 5,
-  },
-  dayChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#FFFFFF',
-  },
-  dayChipSelected: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
-  },
-  dayChipText: {
-    fontSize: 12,
-    color: '#374151',
-  },
-  dayChipTextSelected: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  timeInput: {
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: '#111827',
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -617,8 +529,13 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
   fullWidthButtonWrapper: {
-   marginHorizontal: -SPACING.xl,
+   position: 'absolute',
+   bottom: 0,
+   left: 0,
+   right: 0,
    backgroundColor: colors.white,
+   borderTopWidth: 1,
+   borderTopColor: '#E5E7EB',
   },
   buttonContainer: {
     paddingVertical: 15,
