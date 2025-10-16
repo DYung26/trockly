@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FONT_SIZES,  } from '../constants/typography';
+import { useRouter } from 'expo-router';
 import { SPACING } from '../constants/layout';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
@@ -29,10 +29,10 @@ interface Confetti {
 }
 
 const SuccessScreen: React.FC<SuccessScreenProps> = ({ onComplete }) => {
+  const router = useRouter();
   const checkmarkScale = useRef(new Animated.Value(0)).current;
   const checkmarkOpacity = useRef(new Animated.Value(0)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
-  //const confettiPieces = useRef<Confetti[]>([]);
   const [confettiPieces, setConfettiPieces] = useState<Confetti[]>([]);
 
   // Confetti colors matching the design
@@ -135,7 +135,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({ onComplete }) => {
     }, 100);
 
     const timer = setTimeout(() => {
-        if (onComplete) onComplete();
+       router.replace('/post-account/onboarding');
     }, 3500);
 
     return () => clearTimeout(timer);

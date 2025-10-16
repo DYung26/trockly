@@ -5,10 +5,12 @@ import {
   ScrollView,
   TouchableOpacity, 
   Image,
+  Alert,
   StyleSheet 
 } from 'react-native';
 import { Button } from '../reusables/PostButton';
 import { LOCATIONS } from '../constants/data';
+import * as Location from 'expo-location';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
@@ -27,6 +29,46 @@ export const LocationFlow: React.FC<LocationFlowProps> = ({
 }) => {
   const [view, setView] = useState<'initial' | 'manual'>('initial');
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleLocationAccess = async () => {
+  try {
+    // Request foreground location permissions
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    
+    if (status === 'granted') {
+      // Permission granted, get the location
+      const location = await Location.getCurrentPositionAsync({});
+      console.log('Location:', location);
+      
+      // You can reverse geocode to get the address
+      const address = await Location.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+      
+      if (address[0]) {
+        // Set the location (you might want to format this)
+        const locationString = `${address[0].city || address[0].district || address[0].subregion}, ${address[0].region}`;
+        onSelect(locationString);
+      }
+      
+      onContinue();
+    } else if (status === 'denied') {
+      // Permission denied
+      Alert.alert(
+        'Location Access Required',
+        'Please enable location access in your device settings to find trades near you.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Open Settings', onPress: () => Location.enableNetworkProviderAsync() }
+        ]
+      );
+    }
+  } catch (error) {
+    console.log('Error getting location:', error);
+    Alert.alert('Error', 'Failed to get your location. Please try again or enter manually.');
+  }
+};
 
   if (view === 'initial') {
     return (
@@ -47,7 +89,7 @@ export const LocationFlow: React.FC<LocationFlowProps> = ({
         </ScrollView>
 
         <View style={styles.buttonAccess}>
-          <Button title="Allow location access" onPress={onContinue}  />
+          <Button title="Allow location access" onPress={handleLocationAccess}  />
           <TouchableOpacity style={styles.textButton} onPress={() => setView('manual')}>
             <ThemedText variant='subtitle'>Enter neighborhood manually</ThemedText>
           </TouchableOpacity>

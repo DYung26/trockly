@@ -89,7 +89,7 @@ export const CompleteProfile: React.FC<CompleteProfileProps> = ({
     }
   };
 
-  const isFormValid = phoneNumber.trim() !== '' && userName.trim() !== '' && profile.photo;
+  const isFormValid = phoneNumber.trim() !== '';
 
   return (
    <KeyboardAvoidingView
