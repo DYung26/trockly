@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import { useRouter } from 'expo-router';
 import DividerWithText from '../reusables/DividerLine';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
+import CountryCodePicker, { Country } from '../components/CountryCodePicker';
+import { countriesData } from '../data/world-country';
 
 type LoginTab = 'phone' | 'email';
 
@@ -30,6 +32,9 @@ const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<Country>(
+    countriesData.find((c) => c.code === 'NG') || countriesData[0]
+  );
 
   const isLoginDisabled = () => {
     if (activeTab === 'phone') {
@@ -39,17 +44,23 @@ const LoginScreen: React.FC = () => {
   };
 
   const handleLogin = async () => {
-   if (isLoading) return;
+    if (isLoading) return;
 
-   setIsLoading(true);
-   try {
-     // Simulate api cals when ready 
-     router.push('/post-account/onboarding')
-   } catch(error: any) {
-       console.error("Login Error", error);
-   } finally {
-    setIsLoading(false);
-   }
+    setIsLoading(true);
+    try {
+      // Simulate api calls when ready
+      // Full phone number: selectedCountry.dialCode + phoneNumber
+      console.log('Phone:', selectedCountry.dialCode + phoneNumber);
+      router.push('/post-account/onboarding');
+    } catch (error: any) {
+      console.error('Login Error', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCountrySelect = (country: Country) => {
+    setSelectedCountry(country);
   };
 
   return (
@@ -65,11 +76,11 @@ const LoginScreen: React.FC = () => {
         >
           {/* Logo */}
           <View style={styles.logoContainer}>
-          <Image 
-             source={require('../../assets/images/mask-group.png')}
-             style={styles.logoImage}
-          />
-            <ThemedText variant='h1'>Welcome Back!</ThemedText>
+            <Image
+              source={require('../../assets/images/mask-group.png')}
+              style={styles.logoImage}
+            />
+            <ThemedText variant="h1">Welcome Back!</ThemedText>
           </View>
 
           {/* Form Card */}
@@ -80,7 +91,12 @@ const LoginScreen: React.FC = () => {
                 style={[styles.tab, activeTab === 'phone' && styles.activeTab]}
                 onPress={() => setActiveTab('phone')}
               >
-                <Text style={[styles.tabText, activeTab === 'phone' && styles.activeTabText]}>
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === 'phone' && styles.activeTabText,
+                  ]}
+                >
                   Phone Number
                 </Text>
               </TouchableOpacity>
@@ -88,22 +104,37 @@ const LoginScreen: React.FC = () => {
                 style={[styles.tab, activeTab === 'email' && styles.activeTab]}
                 onPress={() => setActiveTab('email')}
               >
-                <Text style={[styles.tabText, activeTab === 'email' && styles.activeTabText]}>
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === 'email' && styles.activeTabText,
+                  ]}
+                >
                   Email
                 </Text>
               </TouchableOpacity>
             </View>
 
-            {/* Phone Number Input */}
+            {/* Phone Number Input with Country Code */}
             {activeTab === 'phone' && (
               <View style={styles.inputContainer}>
-               <CustomInput
-                 label="Phone Number"
-                 placeholder="+234 | 7076******"
-                 value={phoneNumber}
-                 onChangeText={setPhoneNumber}
-                 keyboardType="phone-pad"
-               />
+                <Text style={styles.inputLabel}>Phone Number</Text> 
+                <View style={styles.phoneInputWrapper}>
+                  <CountryCodePicker
+                    selectedCountry={selectedCountry}
+                    onSelectCountry={handleCountrySelect}
+                    defaultCountryCode="NG"
+                  />
+                  <View style={styles.phoneInputContainer}>
+                    <CustomInput
+                       label=""
+                      placeholder="7076******"
+                      value={phoneNumber}
+                      onChangeText={setPhoneNumber}
+                      keyboardType="phone-pad"
+                    />
+                  </View>
+                </View>
               </View>
             )}
 
@@ -111,39 +142,41 @@ const LoginScreen: React.FC = () => {
             {activeTab === 'email' && (
               <View style={styles.inputContainer}>
                 <CustomInput
-                   label="Email"
-                   placeholder="E.g golibefelath@gmail.com"
-                   value={email}
-                   onChangeText={setEmail}
-                   keyboardType="email-address"
-                   autoCapitalize="none"
+                  label="Email"
+                  placeholder="E.g golibefelath@gmail.com"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
                 />
               </View>
             )}
 
             {/* Password Input */}
             <View style={styles.inputContainer}>
-               <CustomInput
-                 label="Password"
-                 placeholder="Enter password"
-                 value={password}
-                 onChangeText={setPassword}
-                 secureTextEntry={!showPassword}
-                 rightIcon={
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <CustomInput
+                label="Password"
+                placeholder="Enter password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                rightIcon={
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
                     <Ionicons
-                    name={showPassword  ? 'eye' : 'eye-off'}
-                    size={20}
-                    color="#777A84"
+                      name={showPassword ? 'eye' : 'eye-off'}
+                      size={20}
+                      color="#777A84"
                     />
                   </TouchableOpacity>
-                 }
-               />
+                }
+              />
             </View>
 
             {/* Forgot Password */}
             <TouchableOpacity style={styles.forgotPassword}>
-              <ThemedText variant='h5'>Forgot password?</ThemedText>
+              <ThemedText variant="h5">Forgot password?</ThemedText>
             </TouchableOpacity>
 
             {/* Login Button */}
@@ -167,22 +200,22 @@ const LoginScreen: React.FC = () => {
             {/* Social Login Buttons */}
             <View style={styles.socialButtonsContainer}>
               <TouchableOpacity style={styles.socialButton}>
-                <Image 
+                <Image
                   source={require('../../assets/images/google-img.png')}
                 />
               </TouchableOpacity>
               <TouchableOpacity style={styles.socialButton}>
-                <Image 
-                  source={require('../../assets/images/apple-img.png')}
-                />
+                <Image source={require('../../assets/images/apple-img.png')} />
               </TouchableOpacity>
             </View>
 
             {/* Sign Up Link */}
             <View style={styles.signupContainer}>
-              <ThemedText variant='h6'>Don&apos;t have an account?</ThemedText>
-              <TouchableOpacity onPress={() => router.push('/auth/create-account')}>
-                <ThemedText variant='caption'>Create an Account</ThemedText>
+              <ThemedText variant="h6">Don&apos;t have an account?</ThemedText>
+              <TouchableOpacity
+                onPress={() => router.push('/auth/create-account')}
+              >
+                <ThemedText variant="caption">Create an Account</ThemedText>
               </TouchableOpacity>
             </View>
           </View>
@@ -195,7 +228,7 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.surfacePrimary
+    backgroundColor: colors.surfacePrimary,
   },
   keyboardView: {
     flex: 1,
@@ -210,8 +243,8 @@ const styles = StyleSheet.create({
     marginBottom: SPACING['4xl'],
   },
   logoImage: {
-   width: 146.87,
-   height: 32,
+    width: 146.87,
+    height: 32,
   },
   formCard: {
     backgroundColor: colors.surfacePage,
@@ -246,16 +279,32 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.base,
     color: colors.deepBlue,
     fontWeight: FONT_WEIGHTS.normal,
-    fontFamily: 'Poppins_500Medium'
+    fontFamily: 'Poppins_500Medium',
   },
   activeTabText: {
     fontSize: FONT_SIZES.base,
     color: colors.deepBlue,
     fontWeight: FONT_WEIGHTS.normal,
-    fontFamily: 'Poppins_500Medium'
+    fontFamily: 'Poppins_500Medium',
   },
   inputContainer: {
     marginBottom: SPACING.xl,
+  },
+  inputLabel: {
+    fontSize: FONT_SIZES.sm,
+    color: colors.textPrimary,
+   // marginBottom: SPACING.sm,
+    fontFamily: 'Poppins_500Medium',
+    fontWeight: FONT_WEIGHTS.medium,
+  },
+  phoneInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 10,
+    marginTop: 8,
+  },
+  phoneInputContainer: {
+    flex: 1,
   },
   forgotPassword: {
     alignSelf: 'flex-start',
@@ -270,7 +319,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.base,
     fontWeight: FONT_WEIGHTS.normal,
     fontFamily: 'Poppins_500Medium',
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
   },
   arrow: {
     fontSize: FONT_SIZES.lg,
@@ -303,7 +352,7 @@ const styles = StyleSheet.create({
     color: colors.textDisabled,
     fontSize: FONT_SIZES.base,
     fontWeight: FONT_WEIGHTS.normal,
-    fontFamily: 'Poppins_500Medium'
+    fontFamily: 'Poppins_500Medium',
   },
 });
 

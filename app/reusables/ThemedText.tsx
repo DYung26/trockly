@@ -36,6 +36,18 @@ type Variant =
   | 'tradeText'
   | 'click'
   | 'clickDescription'
+  | 'welcomeText'
+  | 'welcomeWord'
+  | 'userNames'
+  | 'locationText'
+  | 'filterLabel'
+  | 'filterButtonText'
+  | 'resetFilterText'
+  | 'filterOptionText'
+  | 'userName'
+  | 'tradeTitle'
+  | 'tradeQuality'
+  | 'returnOfferText'
 
 interface ThemedTextProps extends TextProps {
   variant?: Variant;
@@ -71,6 +83,8 @@ const ThemedText: React.FC<ThemedTextProps> = ({
       fontFamily: 'Poppins_500Medium',
       color: colors.label,
       lineHeight: 28,
+      textAlign: 'left',
+      alignItems: 'flex-start',
       fontWeight: FONT_WEIGHTS.normal
     },
     h4: {
@@ -137,6 +151,7 @@ const ThemedText: React.FC<ThemedTextProps> = ({
     preferenceTitle: {
       fontSize: FONT_SIZES['3xl'],
       fontFamily: 'Poppins_700Bold',
+      fontWeight: FONT_WEIGHTS.bold,
       color: colors.buttonText,
       textAlign: 'center'
     },
@@ -271,6 +286,75 @@ const ThemedText: React.FC<ThemedTextProps> = ({
       fontFamily: 'Poppins_400Regular',
       marginBottom: 20,
       paddingHorizontal: 5,
+    },
+    welcomeText: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.semibold,
+      fontFamily: 'Poppins_500Medium'
+    },
+    welcomeWord: {
+      color: colors.textBlue
+    },
+    userNames: {
+      color: colors.text
+    },
+    locationText: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.medium,
+      color: colors.textBody,
+      fontFamily: 'Poppins_500Medium'
+    },
+    filterLabel: {
+      color: colors.textFilter,
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.medium,
+      fontFamily: 'Poppins_500Medium',
+      marginRight: SPACING.xs
+    },
+    filterButtonText: {
+      color: colors.textFilter,
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.medium,
+      fontFamily: 'Poppins_500Medium'
+    },
+    resetFilterText: {
+      color: colors.textError,
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.medium,
+      fontFamily: 'Poppins_500Medium'
+    },
+    filterOptionText: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.medium,
+      color: colors.textBody,
+      fontFamily: 'Poppins_500Medium'
+    },
+    userName: {
+      fontSize: FONT_SIZES.base,
+      color: colors.background,
+      fontWeight: FONT_WEIGHTS.medium,
+      fontFamily: 'Poppins_500Medium'
+    },
+    tradeTitle: {
+      color: colors.textAction,
+      fontSize: FONT_SIZES.lg,
+      fontWeight: FONT_WEIGHTS.bold,
+      fontFamily: 'Poppins_700Bold',
+      marginBottom: SPACING.xs,
+      textDecorationLine: 'underline'
+    },
+    tradeQuality: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.medium,
+      color: colors.textAction,
+      marginBottom: SPACING.sm,
+      fontFamily: 'Poppins_500Medium'
+    },
+    returnOfferText: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.medium,
+      color: colors.textAction,
+      fontFamily: "Poppins_500Medium"
     }
   };
 

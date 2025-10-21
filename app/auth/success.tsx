@@ -135,7 +135,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({ onComplete }) => {
     }, 100);
 
     const timer = setTimeout(() => {
-       router.replace('/post-account/onboarding');
+       router.replace('/protected/Home/index');
     }, 3500);
 
     return () => clearTimeout(timer);

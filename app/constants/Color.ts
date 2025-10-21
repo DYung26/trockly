@@ -12,6 +12,8 @@ const textHeadings = '#383A40';
 const textInformation = '#39417C';
 const lightSurface = '#D9D9D9';
 const textAction = '#EFEEF0';
+const textFilter = '#454751';
+const textError = '#A33132';
 
 
 const Colors = {
@@ -25,6 +27,8 @@ const Colors = {
     button: '#007AFF',
     buttonText: '#555965',
     inputBackground: '#f5f5f5',
+    textFilter,
+    textError,
     inputBorder: '#ccc',
     lightSurface,
     label: '#383A40',
@@ -48,6 +52,8 @@ const Colors = {
     grey500,
     textBlue,
     tabIconSelected: tintColorDark,
+    textFilter,
+    textError,
     button: '#007AFF',
     buttonText: '#fff',
     textInformation,
