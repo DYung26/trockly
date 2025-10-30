@@ -10,6 +10,7 @@ import {
   PanResponder,
   ScrollView,
   Platform,
+  Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/app/constants/theme';
@@ -18,6 +19,7 @@ import { SPACING, BORDER_RADIUS } from '@/app/constants/layout';
 import { FONT_SIZES, FONT_WEIGHTS } from '@/app/constants/typography';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Trade } from '@/app/types';
+import { useRouter } from 'expo-router';
 import ThemedText from '@/app/reusables/ThemedText';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -40,6 +42,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onLike,
   onSkip,
 }) => {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeDropdown, setActiveDropdown] = useState<'category' | 'distance' | 'date' | null>(null);
   const [showTooltip, setShowTooltip] = useState<'like' | 'skip' | null>(null);
@@ -227,7 +230,11 @@ const renderCard = (trade: Trade, index: number) => {
            <View style={styles.textContainer}>
              <View style={styles.userInfo}>
                <Image source={{ uri: trade.userPhoto }} style={styles.userAvatar} />
-               <ThemedText variant='userName'>{trade.userName}</ThemedText>
+               <Pressable 
+                 onPress={() => router.push('/protected/Home/trockler-profile')}
+               >
+                <ThemedText variant='userName'>{trade.userName}</ThemedText>
+               </Pressable>
              </View>
 
              <TouchableOpacity>

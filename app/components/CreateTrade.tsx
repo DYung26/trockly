@@ -7,8 +7,10 @@ import {
   Image, 
   StyleSheet,
   KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
   Platform
-} from 'react-native';
+, useColorScheme } from 'react-native';
 import { Button } from '../reusables/PostButton';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,7 +21,7 @@ import { colors } from '../constants/theme';
 import { Trade } from '../types';
 import { CATEGORIES, DAYS  } from '../constants/data';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
-import { useColorScheme } from 'react-native';
+
 
 interface CreateTradeProps {
   trade: Trade;
@@ -90,7 +92,8 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
     >
-    <View style={styles.screenContainer}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}> 
+     <View style={styles.screenContainer}>
       <ScrollView 
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
@@ -332,6 +335,7 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
       </View>
       </View>
     </View>
+    </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };

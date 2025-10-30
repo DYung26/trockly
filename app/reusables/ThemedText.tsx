@@ -48,6 +48,15 @@ type Variant =
   | 'tradeTitle'
   | 'tradeQuality'
   | 'returnOfferText'
+  | 'headerTitle'
+  | 'bioText'
+  | 'preferenceText'
+  | 'itemTitle'
+  | 'itemDate'
+  | 'menuText'
+  | 'reviewDate'
+  | 'reviewItem'
+  
 
 interface ThemedTextProps extends TextProps {
   variant?: Variant;
@@ -85,12 +94,12 @@ const ThemedText: React.FC<ThemedTextProps> = ({
       lineHeight: 28,
       textAlign: 'left',
       alignItems: 'flex-start',
-      fontWeight: FONT_WEIGHTS.normal
+      fontWeight: FONT_WEIGHTS.medium
     },
     h4: {
       fontSize: FONT_SIZES.xs,
       color: colors.buttonText,
-      fontWeight: FONT_WEIGHTS.normal,
+      fontWeight: FONT_WEIGHTS.medium,
       fontFamily: 'Poppins_500Medium',
       marginRight: 8,
     },
@@ -355,6 +364,61 @@ const ThemedText: React.FC<ThemedTextProps> = ({
       fontWeight: FONT_WEIGHTS.medium,
       color: colors.textAction,
       fontFamily: "Poppins_500Medium"
+    },
+    headerTitle: {
+      fontSize: FONT_SIZES.lg,
+      fontFamily: 'Poppins_700Bold',
+      color: colors.text,
+      fontWeight: FONT_WEIGHTS.bold,
+      flex: 1,
+      marginHorizontal: SPACING.md
+    },
+    bioText: {
+      fontSize: FONT_SIZES.lg,
+      fontFamily: 'Poppins_600SemiBold',
+      color: colors.text,
+      fontWeight: FONT_WEIGHTS.semibold,
+      marginBottom: SPACING.sm,
+    },
+    preferenceText:{
+      color: colors.text,
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.medium,
+      fontFamily: 'Poppins_500Medium'
+    },
+    itemTitle: {
+      color: colors.text,
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.bold,
+      fontFamily: 'Poppins_700Bold',
+      marginBottom: SPACING.sm
+    },
+    itemDate: {
+      fontSize: FONT_SIZES.xs,
+      fontWeight: FONT_WEIGHTS.normal,
+      fontFamily: 'Poppins_400Regular',
+      color: colors.buttonText
+    },
+    menuText: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.medium,
+      fontFamily: 'Poppins_500Medium',
+      color: colors.textError
+    },
+    reviewDate: {
+      fontSize: FONT_SIZES.xs,
+      fontWeight: FONT_WEIGHTS.medium,
+      fontFamily: 'Poppins_500Medium',
+      color: colors.textSecondaryDark,
+      marginTop: 2,
+    },
+    reviewItem: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.normal,
+      fontFamily: 'Poppins_400Regular',
+      color: colors.text,
+      marginTop: 5,
+      textDecorationLine: 'underline'
     }
   };
 

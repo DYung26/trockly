@@ -36,6 +36,7 @@ const RootLayout = () => {
         <Stack.Screen name="auth/success" options={{ headerShown: false }} />
         <Stack.Screen name="post-account/onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="protected/Home" options={{ headerShown: false }} />
+         <Stack.Screen name="protected/Home/trockler-profile" options={{ headerShown: false }} />
         <Stack.Screen name="Dashboard/dashboard" options={{ headerShown: false  }} />
       </Stack>
     </ThemeProvider>
