@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../reusables/PostButton';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
+import { useRouter } from 'expo-router';
 import { BORDER_RADIUS, SPACING } from '../constants/layout';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 
@@ -31,6 +32,7 @@ interface Confetti {
 }
 
 export const SuccessScreen: React.FC<SuccessScreenProps> = ({ onFinish }) => {
+  const router = useRouter();
   const checkmarkScale = useRef(new Animated.Value(0)).current;
   const checkmarkOpacity = useRef(new Animated.Value(0)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
@@ -227,7 +229,7 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({ onFinish }) => {
             </TouchableOpacity>
 
             <View style={styles.primaryButton}>
-              <Button title="Go to home" onPress={onFinish} />
+              <Button title="Go to home" onPress={() => router.push('/Dashboard/dashboard')} />
             </View>
           </View>
         </Animated.View>

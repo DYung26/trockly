@@ -17,9 +17,13 @@ export interface Preference {
 }
 
 export interface Trade {
+    id: number;
+    userId: string;
     category: string;
     title: string;
     photos: string[];
+    userPhoto: string;
+    userName: string;
     returnOffer: string;
     description: string;
     availability: {
@@ -28,4 +32,8 @@ export interface Trade {
     };
     location: string;
     useCurrentLocation: boolean;
+    createdAt: Date;
+    distance?: number;
+    isLiked?: boolean;
+    isSkipped?: boolean;
 }

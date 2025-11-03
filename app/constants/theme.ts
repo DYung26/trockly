@@ -17,10 +17,12 @@ export const colors = {
    buttonDisabled: '#E8E8EA',
   buttonDisabledText: '#9CA3AF',
   red: '#A33132',
+  textHeading: '#383A40',
   whiteBody: '#F3F4F6',
   textBody: '#555965',
   whiteSurface: '#E5E7EB',
   lightSurface: '#D9D9D9',
-  primaryBlue: '#7D8BEA'
+  primaryBlue: '#7D8BEA',
+  darkSecondary: '#454751'
 }
 

@@ -195,7 +195,9 @@ const SignupScreen: React.FC = () => {
             />
 
             {/* Explore as Guest */}
-            <TouchableOpacity style={styles.guestButton}>
+            <TouchableOpacity 
+               style={styles.guestButton} 
+               onPress={() => router.push('/post-account/onboarding')}>
               <Text style={styles.guestButtonText}>
                 Explore as guest <Text style={styles.arrow}>→</Text>
               </Text>

@@ -40,8 +40,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
 
   return (
    <View style={styles.container}>
-     <ThemedText variant='h3'>{label}</ThemedText>
-
+      <ThemedText variant='h3'>{label}</ThemedText>
      <View 
       style={[
         styles.inputWrapper,
@@ -70,7 +69,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
 
 const styles = StyleSheet.create({
  container: {
-   // marginBottom: 20,
+    marginBottom: 0,
   },
   label: {
     fontSize: FONT_SIZES.base,
