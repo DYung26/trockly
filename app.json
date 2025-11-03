@@ -16,7 +16,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Trockly needs access to your photo library to let you upload a profile picture.",
-        "NSCameraUsageDescription": "Trockly may need camera access if you want to take a new profile photo."
+        "NSCameraUsageDescription": "Trockly may need camera access if you want to take a new profile photo.",
+         "NSLocationWhenInUseUsageDescription": "Trockly needs your location to show you nearby trades and offers in your area."
       }
     },
     "android": {
@@ -28,6 +29,8 @@
       "predictiveBackGestureEnabled": false,
 
       "permissions": [
+         "ACCESS_FINE_LOCATION",
+         "ACCESS_COARSE_LOCATION",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "CAMERA"

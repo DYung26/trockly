@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react';
 import { 
   View, 
   Text, 
-  ScrollView, 
   StyleSheet,
   Animated,
   PanResponder,
@@ -84,43 +83,43 @@ export const SetSwapDistance: React.FC<SetSwapDistanceProps> = ({
       <ThemedText variant='subtitle'>Choose how far you want to discover offers</ThemedText>
     </View>
 
-  <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <View style={styles.contentContainer}>
       <View style={styles.sliderContainer}>
-      <View style={[styles.sliderTrack, { width: sliderWidth }]}>
-       <Animated.View
-         style={[
-            styles.sliderFill,
-            {
-             width: fillWidth,
-            },
-         ]}
-       />
-       <Animated.View
-        {...panResponder.panHandlers}
-        style={[styles.sliderThumb, { transform: [{ translateX: thumbX }] }]}
-       />
-      </View>
+        <View style={[styles.sliderTrack, { width: sliderWidth }]}>
+          <Animated.View
+            style={[
+              styles.sliderFill,
+              {
+                width: fillWidth,
+              },
+            ]}
+          />
+          <Animated.View
+            {...panResponder.panHandlers}
+            style={[styles.sliderThumb, { transform: [{ translateX: thumbX }] }]}
+          />
+        </View>
 
-      <View style={[styles.sliderNumbers, { width: sliderWidth}]}>
-       {[1, 2, 3, 4, 5].map((num) => (
-        <Text
-         key={num}
-         style={[
-          styles.sliderNumber,
-          swapDistance === num && styles.activeNumber,
-         ]}
-        >
-         {num}
-        </Text>
-       ))}
+        <View style={[styles.sliderNumbers, { width: sliderWidth}]}>
+          {[1, 2, 3, 4, 5].map((num) => (
+            <Text
+              key={num}
+              style={[
+                styles.sliderNumber,
+                swapDistance === num && styles.activeNumber,
+              ]}
+            >
+              {num}
+            </Text>
+          ))}
+        </View>
       </View>
     </View>
-  </ScrollView>
 
     <View style={styles.fullWidthButtonWrapper}>
       <View style={styles.buttonContainer}>
-      <Button title="Continue" onPress={onContinue} />
-    </View>
+        <Button title="Continue" onPress={onContinue} />
+      </View>
     </View>
   </View>
  )
@@ -136,11 +135,12 @@ const styles = StyleSheet.create({
    paddingTop: SPACING.xl,
    paddingBottom: SPACING.xl
   },
-  scrollContent: {
-    paddingBottom: SPACING.xl,
+  contentContainer: {
+    flex: 1,
+    paddingTop: SPACING['2xl'],
   },
   sliderContainer: {
-    marginTop: SPACING['5xl'],
+    marginTop: SPACING.xl,
     marginBottom: SPACING['4xl'],
   },
   sliderTrack: {
@@ -169,13 +169,15 @@ const styles = StyleSheet.create({
   sliderNumbers: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    flex: 1,
     marginTop: SPACING.lg,
+    paddingHorizontal: 0,
   },
   sliderNumber: {
     fontSize: 14,
     color: '#383A40',
     fontWeight: '500',
+    width: 24,
+    textAlign: 'center',
   },
   activeNumber: {
    color: '#383A40',
