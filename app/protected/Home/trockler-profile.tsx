@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ProfileDetailsScreen } from '@/app/components/ProfileDetailsScreen';
-import { RatingReviewsScreen } from '@/app/components/RatingsReviewsScreen';
+import ProfileDetailsScreen from '@/app/components/ProfileDetailsScreen';
+import RatingReviewsScreen from '@/app/components/RatingsReviewsScreen';
 import { UserProfile, ListedItem, Review } from '@/app/types/profile.types';
 
 export default function TrocklerProfileApp() {
@@ -90,17 +90,15 @@ export default function TrocklerProfileApp() {
   ];
 
   const handleBlockUser = () => {
-    console.log('User blocked');
     // Implement block report logic here 
   };
 
     const handleReportUser = () => {
-    console.log('User reported');
     // Implement your report logic here
   };
 
   const handleUserPress = (userId: string) => {
-    console.log('Navigate to user profile:', userId);
+   // console.log('Navigate to user profile:', userId);
     setCurrentScreen('profile');
   };
 

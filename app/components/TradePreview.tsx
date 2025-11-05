@@ -9,7 +9,7 @@ import {
   Dimensions 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Button } from '../reusables/PostButton';
+import Button from '../reusables/PostButton';
 import ThemedText from '../reusables/ThemedText';
 import { BORDER_RADIUS, SPACING } from '../constants/layout';
 import { colors } from '../constants/theme';
@@ -23,7 +23,7 @@ interface TradePreviewProps {
 
 const { width } = Dimensions.get('window');
 
-export const TradePreview: React.FC<TradePreviewProps> = ({ trade, onPublish, onBack }) => {
+ const TradePreview: React.FC<TradePreviewProps> = ({ trade, onPublish, onBack }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleScroll = (event: any) => {
@@ -187,3 +187,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white
   },
 });
+
+export default TradePreview;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { Button } from '../reusables/PostButton';
+import Button from '../reusables/PostButton';
 import { Preference } from '../types';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
@@ -12,7 +12,7 @@ interface SetPreferencesProps {
   onContinue: () => void;
 }
 
-export const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, onContinue }) => {
+const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, onContinue }) => {
   const selectedCount = preferences.filter((p) => p.selected).length;
 
   return (
@@ -290,3 +290,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white
   },
 });
+
+export default SetPreferences;

@@ -31,7 +31,7 @@ interface RatingReviewsScreenProps {
 
 
 
-export const RatingReviewsScreen: React.FC<RatingReviewsScreenProps> =  ({
+const RatingReviewsScreen: React.FC<RatingReviewsScreenProps> =  ({
    reviews,
    averageRating,
    totalReviews,
@@ -484,4 +484,6 @@ const rrStyles = RRStyles.create({
     paddingVertical: SPACING.lg,
     paddingHorizontal: SPACING.lg,
   }
-})
+});
+
+export default RatingReviewsScreen;

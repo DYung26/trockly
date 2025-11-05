@@ -18,7 +18,7 @@ interface ButtonProps {
 }
 
 
-export const Button: React.FC<ButtonProps> = ({
+ const Button: React.FC<ButtonProps> = ({
     title,
     onPress, 
     disabled = false,
@@ -81,3 +81,5 @@ const styles = StyleSheet.create({
     color: colors.textDisabled
   }
 });
+
+export default Button;

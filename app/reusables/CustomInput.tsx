@@ -61,7 +61,9 @@ export const CustomInput: React.FC<CustomInputProps> = ({
 
        {rightIcon && <View style={styles.iconContainer}>{rightIcon}</View>}
      </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+     <View style={{ minHeight: 18, }}>
+         {error ? <Text style={styles.errorText}>{error}</Text> : null}
+     </View>
    </View>
   );
 };
@@ -84,6 +86,7 @@ const styles = StyleSheet.create({
     borderColor: colors.borderColor,
     borderRadius: BORDER_RADIUS.lg,
     paddingHorizontal: SPACING.lg,
+    height: 52,
   },
   textAreaWrapper: {
    alignItems: 'flex-start',
@@ -92,7 +95,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: 10,
     fontSize: FONT_SIZES.md,
     color: colors.black
   },

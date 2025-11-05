@@ -1,6 +1,3 @@
-// Example: How to integrate the Dashboard into your app
-// This would typically be in your main App.tsx or a navigation file
-
 import React, { useState } from 'react';
 import { Dashboard } from '../protected/_layout';
 import { Trade } from '../types';
@@ -77,7 +74,6 @@ export default function MainLayout() {
 
   const handleCreatePost = () => {
     // Navigate to create trade screen
-    console.log('Navigate to create trade');
   };
 
   return (

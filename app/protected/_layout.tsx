@@ -7,7 +7,7 @@ import {
   Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { HomeScreen } from './Home';
+import { HomeScreen } from './Home/home';
 import { colors } from '../constants/theme';
 import { BlurView } from 'expo-blur';
 import { SPACING  } from '../constants/layout';
@@ -32,11 +32,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [activeTab, setActiveTab] = useState<'home' | 'posts' | 'inbox' | 'profile'>('home');
 
   const handleLike = (tradeId: string | number) => {
-    console.log('Liked trade:', tradeId);
+    //console.log('Liked trade:', tradeId);
   };
 
   const handleSkip = (tradeId: string | number) => {
-     console.log('Skipped trade:', tradeId);
+    // console.log('Skipped trade:', tradeId);
      // Handle skip logic - move to next trade 
   };
 
