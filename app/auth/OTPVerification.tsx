@@ -36,7 +36,7 @@ const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleOtpChange = (value: string, index: number) => {
-    // Only allow numbers 
+    // Only allow numbers
     if (value && !/^\d+$/.test(value)) return;
 
     const newOtp = [...otp];
@@ -170,6 +170,18 @@ const styles = StyleSheet.create({
     marginTop: SPACING['4xl'],
     marginBottom: SPACING['2xl'],
   },
+  logo: {
+    fontSize: FONT_SIZES['4xl'],
+    fontWeight: 'bold',
+    color: colors.primary,
+    letterSpacing: 2,
+    marginBottom: SPACING.sm,
+  },
+  subtitle: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
   otpCard: {
     backgroundColor: colors.white,
     paddingHorizontal: SPACING['2xl'],
@@ -199,6 +211,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: colors.textPrimary,
   },
+  title: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    flex: 1,
+  },
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -220,6 +238,24 @@ const styles = StyleSheet.create({
   otpInputFilled: {
     borderColor:  colors.blue,
     borderWidth: 2,
+  },
+  verifyButton: {
+    backgroundColor: colors.buttonDisabled,
+    borderRadius: BORDER_RADIUS.lg,
+    paddingVertical: SPACING.lg,
+    alignItems: 'center',
+    marginBottom: SPACING['4xl'],
+  },
+  verifyButtonActive: {
+    backgroundColor: colors.primary,
+  },
+  verifyButtonText: {
+    color: colors.buttonDisabledText,
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+  },
+  verifyButtonTextActive: {
+    color: colors.white,
   },
   supportContainer: {
     flexDirection: 'row',

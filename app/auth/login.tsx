@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   Platform,
   Image,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ThemedText from '../reusables/ThemedText';
@@ -33,25 +32,13 @@ const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<Country>(
     countriesData.find((c) => c.code === 'NG') || countriesData[0]
   );
 
- const validatePhoneNumber = (input: string) => {
-  const trimmed = input.trim();
-  const regex = /^([7-9][0-1][0-9]{8})$/; 
-  if (!regex.test(trimmed)) {
-    setPhoneError('Phone number must start with second digit and be 10 digits after country.');
-    return false;
-  }
-  setPhoneError(null);
-  return true;
-};
-
   const isLoginDisabled = () => {
     if (activeTab === 'phone') {
-      return !phoneNumber.trim() || !password.trim() || !!phoneError;
+      return !phoneNumber.trim() || !password.trim();
     }
     return !email.trim() || !password.trim();
   };
@@ -59,13 +46,11 @@ const LoginScreen: React.FC = () => {
   const handleLogin = async () => {
     if (isLoading) return;
 
-    if (activeTab === 'phone' && !validatePhoneNumber(phoneNumber)) {
-        Alert.alert('Invalid Phone Number', "Please enter a valid 11 digit phone number.");
-        return;
-      }
-      setIsLoading(true);
+    setIsLoading(true);
     try {
-      // Simulate API Endpoint      
+      // Simulate api calls when ready
+      // Full phone number: selectedCountry.dialCode + phoneNumber
+      console.log('Phone:', selectedCountry.dialCode + phoneNumber);
       router.push('/post-account/onboarding');
     } catch (error: any) {
       console.error('Login Error', error);
@@ -145,13 +130,8 @@ const LoginScreen: React.FC = () => {
                        label=""
                       placeholder="7076******"
                       value={phoneNumber}
-                      onChangeText={(text) => {
-                        setPhoneNumber(text);
-                        validatePhoneNumber(text);
-                      }}
-                      keyboardType="number-pad"
-                      error={phoneError || undefined}
-                      maxLength={10}
+                      onChangeText={setPhoneNumber}
+                      keyboardType="phone-pad"
                     />
                   </View>
                 </View>
@@ -195,10 +175,7 @@ const LoginScreen: React.FC = () => {
             </View>
 
             {/* Forgot Password */}
-            <TouchableOpacity 
-               style={styles.forgotPassword}
-               onPress={() => router.push('/auth/forgot-password')}
-               >
+            <TouchableOpacity style={styles.forgotPassword}>
               <ThemedText variant="h5">Forgot password?</ThemedText>
             </TouchableOpacity>
 
@@ -322,14 +299,12 @@ const styles = StyleSheet.create({
   },
   phoneInputWrapper: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    alignItems: 'flex-end',
+    gap: 10,
     marginTop: 8,
   },
   phoneInputContainer: {
     flex: 1,
-  height: 52,
-    justifyContent: 'center',
   },
   forgotPassword: {
     alignSelf: 'flex-start',
@@ -371,7 +346,6 @@ const styles = StyleSheet.create({
   signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 4,
     alignItems: 'center',
   },
   signupText: {

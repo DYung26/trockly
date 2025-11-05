@@ -7,7 +7,7 @@ import {
   PanResponder,
   Dimensions
 } from 'react-native';
-import Button from '../reusables/PostButton';
+import { Button } from '../reusables/PostButton';
 import { BORDER_RADIUS, SPACING } from '../constants/layout';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
@@ -18,7 +18,7 @@ interface SetSwapDistanceProps {
   onContinue: () => void;
 }
 
-const SetSwapDistance: React.FC<SetSwapDistanceProps> = ({
+export const SetSwapDistance: React.FC<SetSwapDistanceProps> = ({
   swapDistance,
   onDistanceChange,
   onContinue,
@@ -193,5 +193,3 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
 });
-
-export default SetSwapDistance;

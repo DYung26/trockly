@@ -8,7 +8,7 @@ import {
   StyleSheet, 
   Dimensions 
 } from 'react-native';
-import Button from './PostButton';
+import { Button } from './PostButton';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 import { colors } from '../constants/theme';
@@ -82,11 +82,7 @@ export const OTPModal: React.FC<OTPModalProps> = ({
 
             {/* Verify Button */}
             <View style={styles.buttonWrapper}>
-              <Button 
-               title="Verify" 
-               onPress={onVerify} 
-                disabled={otp.some((digit) => digit === '')}
-               />
+              <Button title="Verify" onPress={onVerify} />
             </View>
           </View>
 

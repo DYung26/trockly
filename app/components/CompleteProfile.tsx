@@ -12,7 +12,7 @@ import {
  Keyboard
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import Button from '../reusables/PostButton';
+import { Button } from '../reusables/PostButton';
 import { OTPModal } from '../reusables/OTPModal';
 import { Profile } from '../types';
 import { colors } from '../constants/theme';
@@ -20,9 +20,7 @@ import { SPACING } from '../constants/layout';
 import ThemedText from '../reusables/ThemedText';
 import { CustomInput } from '../reusables/CustomInput';
 import { Ionicons } from '@expo/vector-icons';
-import CountryCodePicker, { Country } from './CountryCodePicker';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
-import { countriesData } from '../data/world-country';
 
 
 interface CompleteProfileProps {
@@ -31,7 +29,7 @@ interface CompleteProfileProps {
   onContinue: () => void;
 }
 
- const CompleteProfile: React.FC<CompleteProfileProps> = ({ 
+export const CompleteProfile: React.FC<CompleteProfileProps> = ({ 
   profile, 
   onUpdate, 
   onContinue 
@@ -41,23 +39,6 @@ interface CompleteProfileProps {
   const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber || '');
   const [userName, setUserName] = useState(profile.username || '');
   const [bio, setBio] = useState(profile.bio || '');
-  const [phoneError, setPhoneError] = useState<string | null>(null);
-  const [selectedCountry, setSelectedCountry] = useState<Country>(
-     countriesData.find((c) => c.code === 'NG') || countriesData[0]
-  );
-
-  
- const validatePhoneNumber = (input: string) => {
-  const trimmed = input.trim();
-  const regex = /^([7-9][0-1][0-9]{8})$/; 
-  if (!regex.test(trimmed)) {
-    setPhoneError('Phone number must start with second digit and be 10 digits after country.');
-    return false;
-  }
-  setPhoneError(null);
-  return true;
-};
-
 
   useEffect(() => {
     onUpdate({
@@ -88,6 +69,7 @@ interface CompleteProfileProps {
         });
       }
     } catch (error) {
+      console.log('Error picking image:', error);
       alert('Failed to pick image. Please try again.');
     }
   };
@@ -146,44 +128,13 @@ interface CompleteProfileProps {
         </View>
 
         {/* Phone Number Input */}  
-         {/* <View style={styles.phoneContainer}>
+         <View style={styles.phoneContainer}>
           <CustomInput
            label="Phone Number"
            value={phoneNumber}
             onChangeText={setPhoneNumber}
             keyboardType="phone-pad"
            />
-         </View> */}
-
-         <View style={styles.phoneContainer}>
-           <Text style={{ fontSize: 14, color: colors.textPrimary, fontFamily: 'Poppins_500Medium', marginBottom: 8 }}>
-            Phone Number
-           </Text>
-           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <CountryCodePicker
-              selectedCountry={selectedCountry}
-              onSelectCountry={setSelectedCountry}
-              defaultCountryCode="NG"
-            />
-            <View style={{ flex: 1}}>
-             <CustomInput
-              label=""
-               placeholder="7076******"
-              value={phoneNumber}
-              onChangeText={(value) => {
-                  setPhoneNumber(value);
-                if (value && !validatePhoneNumber(value)) {
-                  setPhoneError('Please enter a valid phone number');
-                } else {
-                  setPhoneError('');
-                }
-              }}
-              keyboardType="number-pad"
-              error={phoneError || undefined}
-              maxLength={10}
-             />
-            </View>
-           </View>
          </View>
 
         {/* Username Input */}
@@ -305,6 +256,3 @@ cancelIconContainer: {
     backgroundColor: colors.white,
   },
 });
-
-
-export default CompleteProfile;
