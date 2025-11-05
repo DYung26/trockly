@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   Platform
 , useColorScheme } from 'react-native';
-import { Button } from '../reusables/PostButton';
+import Button from '../reusables/PostButton';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import ThemedText from '../reusables/ThemedText';
@@ -30,7 +30,7 @@ interface CreateTradeProps {
 }
 
 
-export const CreateTrade: React.FC<CreateTradeProps> = ({ 
+ const CreateTrade: React.FC<CreateTradeProps> = ({ 
  trade, 
  onUpdate, 
  onPreview,
@@ -71,7 +71,6 @@ export const CreateTrade: React.FC<CreateTradeProps> = ({
         });
       }
      } catch (error) {
-       console.log('Error picking image:', error);
        alert('Failed to pick image. Please try again.');
      }
   };
@@ -547,3 +546,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
 });
+
+export default CreateTrade;

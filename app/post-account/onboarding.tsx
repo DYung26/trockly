@@ -9,13 +9,13 @@ import { PREFERENCES } from '../constants/data';
 
 import { ProgressBar } from '../reusables/ProgressBar';
 
-import { LocationFlow } from '../components/LocationFlow';
-import { CompleteProfile } from '../components/CompleteProfile';
-import { SetPreferences } from '../components/SetPreference';
-import { SetSwapDistance } from  '../components/SetSwapDistance';
-import { CreateTrade } from  '../components/CreateTrade';
-import { TradePreview } from '../components/TradePreview';
-import { SuccessScreen } from '../components/SuccessScreen';
+import LocationFlow from '../components/LocationFlow';
+import CompleteProfile from '../components/CompleteProfile';
+import SetPreferences from '../components/SetPreference';
+import SetSwapDistance from '../components/SetSwapDistance';
+import CreateTrade from '../components/CreateTrade';
+import TradePreview from '../components/TradePreview';
+import SuccessScreen from '../components/SuccessScreen';
 
 const Onboarding: React.FC = () => {
   const swiperRef = useRef<Swiper>(null);
@@ -64,7 +64,6 @@ const Onboarding: React.FC = () => {
   };
 
   const handleFinish = () => {
-    console.log('Onboarding completed!');
     // Navigate to home screen or reset flow
   };
 

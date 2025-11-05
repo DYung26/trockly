@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import AuthButton from '../reusables/AuthButton';
 import { SPACING } from '../constants/layout';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
@@ -28,7 +29,7 @@ interface Confetti {
   shape: 'square' | 'circle' | 'ribbon';
 }
 
-const SuccessScreen: React.FC<SuccessScreenProps> = ({ onComplete }) => {
+const ResetSuccessScreen: React.FC<SuccessScreenProps> = ({ onComplete }) => {
   const router = useRouter();
   const checkmarkScale = useRef(new Animated.Value(0)).current;
   const checkmarkOpacity = useRef(new Animated.Value(0)).current;
@@ -133,12 +134,6 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({ onComplete }) => {
         ]).start();
         });
     }, 100);
-
-    const timer = setTimeout(() => {
-       router.replace('/Dashboard/dashboard');
-    }, 3500);
-
-    return () => clearTimeout(timer);
   }, []);
 
  
@@ -219,12 +214,18 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({ onComplete }) => {
             { opacity: textOpacity },
           ]}
         >
-          <ThemedText variant='h1'>Account created successfully</ThemedText>
+          <ThemedText variant='h1'>Password reset successfully</ThemedText>
           <ThemedText variant='description'>
-            Welcome aboard! You can now post your items and{'\n'}
-            start swiping to discover trades near you.
+            Your password has been updated. You can now log{'\n'}
+            in, post your items, and start discovering great{'\n'}
+                  items near you!
           </ThemedText>
         </Animated.View>
+        <AuthButton
+          title="Proceed to Login"
+          onPress={() => router.replace('/auth/login')}
+          style={{ marginTop: SPACING['2xl'], width: '80%' }}
+          />
       </View>
     </SafeAreaView>
   );
@@ -275,4 +276,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SuccessScreen;
+export default ResetSuccessScreen;

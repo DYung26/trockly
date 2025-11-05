@@ -29,7 +29,7 @@ interface ProfileDetailsScreenProps {
 }
 
 
-export const ProfileDetailsScreen: React.FC<ProfileDetailsScreenProps> = ({
+const ProfileDetailsScreen: React.FC<ProfileDetailsScreenProps> = ({
    userProfile,
    listedItems,
    onNavigateToReviews,
@@ -320,7 +320,6 @@ const closeMenus = () => {
            style={styles.menuItem}
            onPress={() => {
              closeMenus();
-             console.log('Trade with:', selectedItem.title);
            }}
          >
            <Text style={[styles.menuText, { color: colors.textPrimary}]}>
@@ -539,3 +538,6 @@ const styles = StyleSheet.create({
     color: colors.textBody
   },
 });
+
+
+export default ProfileDetailsScreen;

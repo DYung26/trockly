@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button } from '../reusables/PostButton';
+import Button from '../reusables/PostButton';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
 import { useRouter } from 'expo-router';
@@ -31,7 +31,7 @@ interface Confetti {
   shape: 'square' | 'circle' | 'ribbon' | 'star';
 }
 
-export const SuccessScreen: React.FC<SuccessScreenProps> = ({ onFinish }) => {
+ const SuccessScreen: React.FC<SuccessScreenProps> = ({ onFinish }) => {
   const router = useRouter();
   const checkmarkScale = useRef(new Animated.Value(0)).current;
   const checkmarkOpacity = useRef(new Animated.Value(0)).current;

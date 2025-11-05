@@ -8,35 +8,27 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
 import { FONT_SIZES } from '../constants/typography';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
 import AuthButton from '../reusables/AuthButton';
-import { useRouter} from 'expo-router';
 
-interface OTPVerificationScreenProps {
-  email?: string;
-  phoneNumber?: string;
-  onVerifySuccess: () => void;
-  onBack?: () => void;
-}
-
-const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
-  email = 'gol***th@gmail.com',
-  phoneNumber,
-  onVerifySuccess,
-  onBack,
-}) => {
-    const router = useRouter();
+const ForgotPasswordVerificationScreen: React.FC = () => {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const email = params.email as string;
+  
   const [otp, setOtp] = useState(['', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleOtpChange = (value: string, index: number) => {
-    // Only allow numbers 
+    // Only allow numbers
     if (value && !/^\d+$/.test(value)) return;
 
     const newOtp = [...otp];
@@ -62,12 +54,14 @@ const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
 
     setIsLoading(true);
     try {
-      // Simulate API call
+      // Simulate API call to verify OTP
       await new Promise((resolve) => setTimeout(resolve, 1500));
       
-      // Call success callback
-      router.push('/auth/success');
-     // onVerifySuccess();
+      // Navigate to reset password screen
+      router.push({
+        pathname: '/auth/reset-password',
+        params: { email, otpCode }
+      });
     } catch (error) {
       console.error('OTP verification failed:', error);
     } finally {
@@ -75,9 +69,13 @@ const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
     }
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   const isVerifyDisabled = otp.some((digit) => !digit) || isLoading;
 
-  const maskedContact = email || phoneNumber || 'gol***th@gmail.com';
+  const maskedEmail = email || 'gol***th@gmail.com';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -85,29 +83,31 @@ const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <View style={styles.content}>
+        <View 
+         style={styles.content}
+        >
           {/* Logo */}
           <View style={styles.logoContainer}>
-           <Image
-             source={require('../../assets/images/mask-group.png')} 
-           />
-           <ThemedText variant='h1'>Welcome to Trockly</ThemedText>
+            <Image
+              source={require('../../assets/images/mask-group.png')}
+            />
+            <ThemedText variant="h1">Welcome to Trockly</ThemedText>
           </View>
 
           {/* OTP Card */}
           <View style={styles.otpCard}>
             {/* Back Button and Title */}
             <View style={styles.header}>
-              <TouchableOpacity onPress={onBack} style={styles.backButton}>
+              <TouchableOpacity onPress={handleBack} style={styles.backButton}>
                 <Text style={styles.backIcon}>←</Text>
               </TouchableOpacity>
-              <ThemedText variant='subheading'>OTP Verification</ThemedText>
+              <ThemedText variant="subheading">Forgot Password</ThemedText>
             </View>
 
             {/* Instructions */}
-            <ThemedText variant='instructions'>
+            <ThemedText variant="instructions" style={styles.instructions}>
               Enter the 4-digit code we sent to{'\n'}
-              <ThemedText variant='instructions'>{maskedContact}</ThemedText> to verify your email
+              <ThemedText variant="instructions">{maskedEmail}</ThemedText> to verify your email
             </ThemedText>
 
             {/* OTP Input Boxes */}
@@ -116,7 +116,7 @@ const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
                 <TextInput
                   key={index}
                   ref={(ref) => {
-                    (inputRefs.current[index] = ref)
+                    inputRefs.current[index] = ref;
                   }}
                   style={[
                     styles.otpInput,
@@ -133,21 +133,21 @@ const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
             </View>
 
             {/* Verify Button */}
-           <AuthButton
-            title="Verify"
-            onPress={handleVerify}
-            disabled={isVerifyDisabled || isLoading}
-            loading={isLoading}
-           />
-
-            {/* Contact Support */}
-            <View style={styles.supportContainer}>
-              <Text style={styles.supportText}>Need help? </Text>
-              <TouchableOpacity>
-                <Text style={styles.supportLink}>Contact support</Text>
-              </TouchableOpacity>
-            </View>
+            <AuthButton
+              title="Verify"
+              onPress={handleVerify}
+              disabled={isVerifyDisabled || isLoading}
+              loading={isLoading}
+            />
           </View>
+        </View>
+
+        {/* Contact Support - Fixed at bottom */}
+        <View style={styles.supportContainer}>
+          <Text style={styles.supportText}>Need help? </Text>
+          <TouchableOpacity>
+            <Text style={styles.supportLink}>Contact support</Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -162,7 +162,10 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
-  content: {
+  scrollContent: {
+    flexGrow: 1,
+  },
+   content: {
     flex: 1,
   },
   logoContainer: {
@@ -171,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING['2xl'],
   },
   otpCard: {
-    backgroundColor: colors.white,
+   backgroundColor: colors.white,
     paddingHorizontal: SPACING['2xl'],
     paddingTop: SPACING['3xl'],
     paddingBottom: SPACING['2xl'],
@@ -199,6 +202,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: colors.textPrimary,
   },
+  instructions: {
+    marginBottom: SPACING['2xl'],
+  },
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -218,11 +224,11 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   otpInputFilled: {
-    borderColor:  colors.blue,
+    borderColor: colors.blue,
     borderWidth: 2,
   },
   supportContainer: {
-    flexDirection: 'row',
+   flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
@@ -242,4 +248,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OTPVerificationScreen;
+export default ForgotPasswordVerificationScreen;
