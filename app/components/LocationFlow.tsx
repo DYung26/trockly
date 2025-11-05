@@ -8,7 +8,7 @@ import {
   Alert,
   StyleSheet 
 } from 'react-native';
-import Button from '../reusables/PostButton';
+import { Button } from '../reusables/PostButton';
 import { LOCATIONS } from '../constants/data';
 import * as Location from 'expo-location';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
@@ -22,7 +22,7 @@ interface LocationFlowProps {
   onContinue: () => void;
 }
 
-const LocationFlow: React.FC<LocationFlowProps> = ({
+export const LocationFlow: React.FC<LocationFlowProps> = ({
   selectedLocation,
   onSelect,
   onContinue,
@@ -38,6 +38,7 @@ const LocationFlow: React.FC<LocationFlowProps> = ({
     if (status === 'granted') {
       // Permission granted, get the location
       const location = await Location.getCurrentPositionAsync({});
+      console.log('Location:', location);
       
       // You can reverse geocode to get the address
       const address = await Location.reverseGeocodeAsync({
@@ -64,6 +65,7 @@ const LocationFlow: React.FC<LocationFlowProps> = ({
       );
     }
   } catch (error) {
+    console.log('Error getting location:', error);
     Alert.alert('Error', 'Failed to get your location. Please try again or enter manually.');
   }
 };
@@ -299,5 +301,3 @@ screenContainerCenter: {
     color: '#6B7280',
   },
 });
-
-export default LocationFlow;

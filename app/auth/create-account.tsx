@@ -69,6 +69,7 @@ const SignupScreen: React.FC = () => {
     setIsLoading(true);
     try {
       // Add your signup logic here
+      console.log('Creating account...');
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
       router.push('/auth/OTPVerification');

@@ -33,13 +33,9 @@ const RootLayout = () => {
         <Stack.Screen name="auth/create-account" options={{ headerShown: false }} />
         <Stack.Screen name="auth/login" options={{ headerShown: false }} />
         <Stack.Screen name="auth/OTPVerification" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/forgot-password" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/reset-password" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/forgotPasswordVerificationScreen" options={{ headerShown: false }} />
         <Stack.Screen name="auth/success" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/reset-success" options={{ headerShown: false }} />
         <Stack.Screen name="post-account/onboarding" options={{ headerShown: false }} />
-        <Stack.Screen name="protected/Home/home" options={{ headerShown: false }} />
+        <Stack.Screen name="protected/Home" options={{ headerShown: false }} />
          <Stack.Screen name="protected/Home/trockler-profile" options={{ headerShown: false }} />
         <Stack.Screen name="Dashboard/dashboard" options={{ headerShown: false  }} />
       </Stack>
