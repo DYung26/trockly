@@ -8,20 +8,22 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
 import { FONT_SIZES } from '../constants/typography';
+import { useAuth } from '../context/AuthContext';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
 import AuthButton from '../reusables/AuthButton';
+import { showErrorToast } from '../utils/toast';
 
 const ForgotPasswordVerificationScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const email = params.email as string;
+  const { verifyOtp } = useAuth();
   
   const [otp, setOtp] = useState(['', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,16 +56,15 @@ const ForgotPasswordVerificationScreen: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call to verify OTP
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+     await verifyOtp(email, otpCode);
       
       // Navigate to reset password screen
       router.push({
         pathname: '/auth/reset-password',
-        params: { email, otpCode }
+        params: { email, otpCode } // Pass otpCode 
       });
-    } catch (error) {
-      console.error('OTP verification failed:', error);
+    } catch (error: any) {
+     showErrorToast(error.message || 'OTP verification failed');
     } finally {
       setIsLoading(false);
     }

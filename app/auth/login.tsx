@@ -1,4 +1,6 @@
-import React, { useState} from 'react';
+// screens/LoginScreen.tsx
+
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -20,62 +22,63 @@ import { useRouter } from 'expo-router';
 import DividerWithText from '../reusables/DividerLine';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
-import CountryCodePicker, { Country } from '../components/CountryCodePicker';
-import { countriesData } from '../data/world-country';
-
-type LoginTab = 'phone' | 'email';
+import { useAuth } from '../context/AuthContext';
+import { validateLoginForm } from '../utils/validation';
+import { showErrorToast } from '../utils/toast';
 
 const LoginScreen: React.FC = () => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<LoginTab>('phone');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const { login } = useAuth();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [phoneError, setPhoneError] = useState<string | null>(null);
-  const [selectedCountry, setSelectedCountry] = useState<Country>(
-    countriesData.find((c) => c.code === 'NG') || countriesData[0]
-  );
-
- const validatePhoneNumber = (input: string) => {
-  const trimmed = input.trim();
-  const regex = /^([7-9][0-1][0-9]{8})$/; 
-  if (!regex.test(trimmed)) {
-    setPhoneError('Phone number must start with second digit and be 10 digits after country.');
-    return false;
-  }
-  setPhoneError(null);
-  return true;
-};
+  const [validationErrors, setValidationErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
 
   const isLoginDisabled = () => {
-    if (activeTab === 'phone') {
-      return !phoneNumber.trim() || !password.trim() || !!phoneError;
-    }
     return !email.trim() || !password.trim();
   };
 
   const handleLogin = async () => {
     if (isLoading) return;
 
-    if (activeTab === 'phone' && !validatePhoneNumber(phoneNumber)) {
-        Alert.alert('Invalid Phone Number', "Please enter a valid 11 digit phone number.");
-        return;
-      }
-      setIsLoading(true);
+    // Validate form
+    const errors = validateLoginForm(email, password);
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      const firstError = Object.values(errors)[0];
+      Alert.alert('Validation Error', firstError);
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      // Simulate API Endpoint      
-      router.push('/post-account/onboarding');
+      await login(email.trim().toLowerCase(), password);
+
+      // Navigate to onboarding or home after successful login
+      router.replace('/post-account/onboarding');
     } catch (error: any) {
-      console.error('Login Error', error);
+     showErrorToast(
+      error.message || 'Invalid email or password. Please try again.'
+     );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCountrySelect = (country: Country) => {
-    setSelectedCountry(country);
+  const clearFieldError = (field: 'email' | 'password') => {
+    if (validationErrors[field]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
   };
 
   return (
@@ -100,77 +103,21 @@ const LoginScreen: React.FC = () => {
 
           {/* Form Card */}
           <View style={styles.formCard}>
-            {/* Tab Switcher */}
-            <View style={styles.tabContainer}>
-              <TouchableOpacity
-                style={[styles.tab, activeTab === 'phone' && styles.activeTab]}
-                onPress={() => setActiveTab('phone')}
-              >
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeTab === 'phone' && styles.activeTabText,
-                  ]}
-                >
-                  Phone Number
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.tab, activeTab === 'email' && styles.activeTab]}
-                onPress={() => setActiveTab('email')}
-              >
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeTab === 'email' && styles.activeTabText,
-                  ]}
-                >
-                  Email
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Phone Number Input with Country Code */}
-            {activeTab === 'phone' && (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Phone Number</Text> 
-                <View style={styles.phoneInputWrapper}>
-                  <CountryCodePicker
-                    selectedCountry={selectedCountry}
-                    onSelectCountry={handleCountrySelect}
-                    defaultCountryCode="NG"
-                  />
-                  <View style={styles.phoneInputContainer}>
-                    <CustomInput
-                       label=""
-                      placeholder="7076******"
-                      value={phoneNumber}
-                      onChangeText={(text) => {
-                        setPhoneNumber(text);
-                        validatePhoneNumber(text);
-                      }}
-                      keyboardType="number-pad"
-                      error={phoneError || undefined}
-                      maxLength={10}
-                    />
-                  </View>
-                </View>
-              </View>
-            )}
-
             {/* Email Input */}
-            {activeTab === 'email' && (
-              <View style={styles.inputContainer}>
-                <CustomInput
-                  label="Email"
-                  placeholder="E.g golibefelath@gmail.com"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-            )}
+            <View style={styles.inputContainer}>
+              <CustomInput
+                label="Email"
+                placeholder="E.g golibefelath@gmail.com"
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  clearFieldError('email');
+                }}
+                error={validationErrors.email}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
 
             {/* Password Input */}
             <View style={styles.inputContainer}>
@@ -178,12 +125,14 @@ const LoginScreen: React.FC = () => {
                 label="Password"
                 placeholder="Enter password"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  clearFieldError('password');
+                }}
+                error={validationErrors.password}
                 secureTextEntry={!showPassword}
                 rightIcon={
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                  >
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                     <Ionicons
                       name={showPassword ? 'eye' : 'eye-off'}
                       size={20}
@@ -195,10 +144,10 @@ const LoginScreen: React.FC = () => {
             </View>
 
             {/* Forgot Password */}
-            <TouchableOpacity 
-               style={styles.forgotPassword}
-               onPress={() => router.push('/auth/forgot-password')}
-               >
+            <TouchableOpacity
+              style={styles.forgotPassword}
+              onPress={() => router.push('/auth/forgot-password')}
+            >
               <ThemedText variant="h5">Forgot password?</ThemedText>
             </TouchableOpacity>
 
@@ -211,7 +160,10 @@ const LoginScreen: React.FC = () => {
             />
 
             {/* Explore as Guest */}
-            <TouchableOpacity style={styles.guestButton} onPress={() => router.push('/post-account/onboarding')}>
+            <TouchableOpacity
+              style={styles.guestButton}
+              onPress={() => router.push('/post-account/onboarding')}
+            >
               <Text style={styles.guestButtonText}>
                 Explore as guest <Text style={styles.arrow}>→</Text>
               </Text>
@@ -223,9 +175,7 @@ const LoginScreen: React.FC = () => {
             {/* Social Login Buttons */}
             <View style={styles.socialButtonsContainer}>
               <TouchableOpacity style={styles.socialButton}>
-                <Image
-                  source={require('../../assets/images/google-img.png')}
-                />
+                <Image source={require('../../assets/images/google-img.png')} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.socialButton}>
                 <Image source={require('../../assets/images/apple-img.png')} />
@@ -235,9 +185,7 @@ const LoginScreen: React.FC = () => {
             {/* Sign Up Link */}
             <View style={styles.signupContainer}>
               <ThemedText variant="h6">Don&apos;t have an account?</ThemedText>
-              <TouchableOpacity
-                onPress={() => router.push('/auth/create-account')}
-              >
+              <TouchableOpacity onPress={() => router.push('/auth/create-account')}>
                 <ThemedText variant="caption">Create an Account</ThemedText>
               </TouchableOpacity>
             </View>
@@ -282,54 +230,8 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: colors.white,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.xs,
-    marginBottom: SPACING['2xl'],
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: SPACING.md,
-    alignItems: 'center',
-    borderRadius: BORDER_RADIUS.md,
-  },
-  activeTab: {
-    backgroundColor: colors.surfacePrimary,
-  },
-  tabText: {
-    fontSize: FONT_SIZES.base,
-    color: colors.deepBlue,
-    fontWeight: FONT_WEIGHTS.normal,
-    fontFamily: 'Poppins_500Medium',
-  },
-  activeTabText: {
-    fontSize: FONT_SIZES.base,
-    color: colors.deepBlue,
-    fontWeight: FONT_WEIGHTS.normal,
-    fontFamily: 'Poppins_500Medium',
-  },
   inputContainer: {
     marginBottom: SPACING.xl,
-  },
-  inputLabel: {
-    fontSize: FONT_SIZES.sm,
-    color: colors.textPrimary,
-   // marginBottom: SPACING.sm,
-    fontFamily: 'Poppins_500Medium',
-    fontWeight: FONT_WEIGHTS.medium,
-  },
-  phoneInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 8,
-  },
-  phoneInputContainer: {
-    flex: 1,
-  height: 52,
-    justifyContent: 'center',
   },
   forgotPassword: {
     alignSelf: 'flex-start',
@@ -373,12 +275,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 4,
     alignItems: 'center',
-  },
-  signupText: {
-    color: colors.textDisabled,
-    fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.normal,
-    fontFamily: 'Poppins_500Medium',
   },
 });
 

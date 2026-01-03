@@ -7,28 +7,31 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
+import { useAuth } from '../context/AuthContext';
 import { FONT_SIZES } from '../constants/typography';
 import { SPACING } from '../constants/layout';
 import AuthButton from '../reusables/AuthButton';
 import { CustomInput } from '../reusables/CustomInput';
 import { Ionicons } from '@expo/vector-icons';
+import { showErrorToast } from '../utils/toast';
 
 const ResetPasswordScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const email = params.email as string;
   const otpCode = params.otpCode as string;
+  const resetToken = params.resetToken as string;
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const {  resetPassword } = useAuth();
   const [newPasswordError, setNewPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -78,14 +81,14 @@ const ResetPasswordScreen: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call to reset password
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Navigate to success screen
+     await resetPassword(email, newPassword, otpCode);
+
+
+     setTimeout(() => {
       router.push('/auth/reset-success');
-    } catch (error) {
-      console.error('Password reset failed:', error);
-      setNewPasswordError('Failed to reset password. Please try again.');
+     }, 1500);
+    } catch (error: any) {
+       showErrorToast(error.message || 'Failed to reset password. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -125,15 +128,12 @@ const ResetPasswordScreen: React.FC = () => {
               <TouchableOpacity onPress={handleBack} style={styles.backButton}>
                 <Text style={styles.backIcon}>←</Text>
               </TouchableOpacity>
-              <ThemedText variant="subheading">Forgot Password</ThemedText>
+              <ThemedText variant="subheading">Reset Password</ThemedText>
             </View>
 
-            {/* Instructions */}
-            <ThemedText variant="instructions" style={styles.instructions}>
-              Enter the 4-digit code we sent to{'\n'}
-              <ThemedText variant="instructions">{email || 'gol***th@gmail.com'}</ThemedText> to verify your email
-            </ThemedText>
-
+             <ThemedText variant="instructions" style={styles.instructions}>
+               Create a new password for your account
+             </ThemedText>
             {/* New Password Input */}
             <View style={styles.inputWrapper}>
               <CustomInput
