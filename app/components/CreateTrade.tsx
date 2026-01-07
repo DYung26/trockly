@@ -101,7 +101,7 @@ interface CreateTradeProps {
         <ThemedText variant='preferenceTitle'>Create an Item</ThemedText>
         
         <View style={{ marginTop: 10 }}>
-            <ThemedText variant='subtitle'>aPost what you want to swap with other trackers</ThemedText>
+            <ThemedText variant='subtitle'>Post what you want to swap with other trackers</ThemedText>
         </View>
 
          {/* --- Category Dropdown --- */}
