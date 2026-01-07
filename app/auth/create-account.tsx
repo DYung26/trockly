@@ -16,9 +16,11 @@ import { BORDER_RADIUS, SPACING } from '../constants/layout';
 import { colors } from '../constants/theme';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 import { CustomInput } from '../reusables/CustomInput';
+import { useAuth } from '../context/AuthContext';
 import DividerWithText from '../reusables/DividerLine';
 import ThemedText from '../reusables/ThemedText';
 import AuthButton from '../reusables/AuthButton';
+import { showErrorToast, showSuccessToast } from '../utils/toast';
 
 interface ValidationErrors {
   password?: string;
@@ -27,6 +29,10 @@ interface ValidationErrors {
 
 const SignupScreen: React.FC = () => {
   const router = useRouter();
+  const { signup } = useAuth();
+  const [firstName, setFirstName] = useState('');
+const [lastName, setLastName] = useState('');
+const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -48,14 +54,17 @@ const SignupScreen: React.FC = () => {
   };
 
   const isSignupEnabled = () => {
-    return (
-      email.trim() !== '' &&
-      password.trim() !== '' &&
-      confirmPassword.trim() !== '' &&
-      agreeToTerms &&
-      password === confirmPassword
-    );
-  };
+  return (
+    firstName.trim() !== '' &&
+    lastName.trim() !== '' &&
+    email.trim() !== '' &&
+    phoneNumber.trim() !== '' &&
+    password.trim() !== '' &&
+    confirmPassword.trim() !== '' &&
+    agreeToTerms &&
+    password === confirmPassword
+  );
+};
 
   const handleConfirmPasswordBlur = () => {
     if (confirmPassword) {
@@ -63,21 +72,38 @@ const SignupScreen: React.FC = () => {
     }
   };
 
-  const handleCreateAccount = async () => {
-    if (!validatePasswords()) return;
+const handleCreateAccount = async () => {
+  if (!validatePasswords()) return;
+  
+  setIsLoading(true);
+  try {
+    await signup({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim().toLowerCase(),
+      phoneNumber: phoneNumber.trim(),
+      password: password,
+      role: 'trockler'
+    });
+
+    showSuccessToast('Account Created. Please check your email to verify your account.');
     
-    setIsLoading(true);
-    try {
-      // Add your signup logic here
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      router.push('/auth/OTPVerification');
-    } catch (error) {
-      console.error('Signup error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    // Navigate after showing toast
+    setTimeout(() => {
+      router.push({
+        pathname: '/auth/OTPVerification',
+        params: { email: email.trim().toLowerCase() }
+      });
+    }, 1500);
+
+  } catch (error: any) {
+     showErrorToast(
+      error.message || 'Failed to create account. Please try again.'
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -101,6 +127,31 @@ const SignupScreen: React.FC = () => {
 
           {/* Form Card */}
           <View style={styles.formCard}>
+            <View style={styles.inputContainer}>
+              <CustomInput
+                label="First Name"
+                placeholder="Enter first name"
+                value={firstName}
+                onChangeText={setFirstName}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <CustomInput
+                label="Last Name"
+                placeholder="Enter last name"
+                value={lastName}
+                onChangeText={setLastName}
+                />
+             </View>
+             <View style={styles.inputContainer}>
+              <CustomInput
+                label="Phone Number"
+                placeholder="E.g +234 800 000 0000"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                keyboardType="phone-pad"
+              />
+            </View>
             {/* Email Input */}
             <View style={styles.inputContainer}>
              <CustomInput
@@ -118,6 +169,7 @@ const SignupScreen: React.FC = () => {
               <CustomInput
                 label="Password"
                 placeholder="Enter password"
+                value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
                 rightIcon={

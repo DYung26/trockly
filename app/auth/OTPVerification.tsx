@@ -15,23 +15,20 @@ import ThemedText from '../reusables/ThemedText';
 import { FONT_SIZES } from '../constants/typography';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
 import AuthButton from '../reusables/AuthButton';
-import { useRouter} from 'expo-router';
+import { useAuth } from '../context/AuthContext';
+import { showErrorToast } from '../utils/toast';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
-interface OTPVerificationScreenProps {
-  email?: string;
-  phoneNumber?: string;
-  onVerifySuccess: () => void;
-  onBack?: () => void;
-}
 
-const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
-  email = 'gol***th@gmail.com',
-  phoneNumber,
-  onVerifySuccess,
-  onBack,
-}) => {
-    const router = useRouter();
-  const [otp, setOtp] = useState(['', '', '', '']);
+
+
+const OTPVerificationScreen: React.FC = () => {
+   const router = useRouter();
+  const { verifyEmail } = useAuth();
+  const params = useLocalSearchParams<{ email: string }>();
+  const email = Array.isArray(params.email) ? params.email[0] : params.email;
+  
+  const [otp, setOtp] = useState(['', '', '', '',]);
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
@@ -60,24 +57,43 @@ const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
     const otpCode = otp.join('');
     if (otpCode.length !== 4) return;
 
+    if (!email) {
+      showErrorToast('Email is required for verification');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await verifyEmail(email, otpCode);
       
-      // Call success callback
-      router.push('/auth/success');
-     // onVerifySuccess();
-    } catch (error) {
+      setTimeout(() => {
+        router.push('/auth/success');
+      }, 1500);
+    } catch (error: any) {
       console.error('OTP verification failed:', error);
+      showErrorToast(
+        error.message || 'Invalid OTP. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+
   const isVerifyDisabled = otp.some((digit) => !digit) || isLoading;
 
-  const maskedContact = email || phoneNumber || 'gol***th@gmail.com';
+  
+
+const maskEmail = (emailStr: string): string => {
+  if (!emailStr || !emailStr.includes('@')) return emailStr;
+  
+  const [username, domain] = emailStr.split('@');
+  const maskedUsername = username.substring(0, 3) + '***' + username.slice(-2);
+  return `${maskedUsername}@${domain}`;
+};
+
+
+const maskedContact = email ? maskEmail(email) : 'No email provided';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -98,7 +114,7 @@ const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
           <View style={styles.otpCard}>
             {/* Back Button and Title */}
             <View style={styles.header}>
-              <TouchableOpacity onPress={onBack} style={styles.backButton}>
+              <TouchableOpacity onPress={router.back} style={styles.backButton}>
                 <Text style={styles.backIcon}>←</Text>
               </TouchableOpacity>
               <ThemedText variant='subheading'>OTP Verification</ThemedText>
@@ -135,7 +151,9 @@ const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
             {/* Verify Button */}
            <AuthButton
             title="Verify"
-            onPress={handleVerify}
+            onPress={async () => {
+              await handleVerify();
+            }}
             disabled={isVerifyDisabled || isLoading}
             loading={isLoading}
            />

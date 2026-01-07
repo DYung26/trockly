@@ -7,19 +7,22 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
 import { FONT_SIZES } from '../constants/typography';
-import { SPACING, BORDER_RADIUS } from '../constants/layout';
+import { SPACING } from '../constants/layout';
+import { useAuth } from '../context/AuthContext';
 import AuthButton from '../reusables/AuthButton';
+import { showErrorToast } from '../utils/toast';
 import { CustomInput } from '../reusables/CustomInput';
 
 const ForgotPasswordScreen: React.FC = () => {
   const router = useRouter();
+  const { forgotPassword } = useAuth();
+  //const [resetToken, setResetToken] = useState('');
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,34 +39,35 @@ const ForgotPasswordScreen: React.FC = () => {
     }
   };
 
+
   const handleContinue = async () => {
-    if (!email.trim()) {
-      setEmailError('Email is required');
-      return;
-    }
+     if (!email.trim()) {
+       setEmailError('Email is required');
+       return;
+     }
 
-    if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
-      return;
-    }
+     if (!validateEmail(email)) {
+       setEmailError('Please enter a valid email address');
+       return;
+     }
 
-    setIsLoading(true);
-    try {
-      // Simulate API call to send OTP
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Navigate to verification screen with email
-      router.push({
+     setIsLoading(true);
+     try {
+       await forgotPassword(email.trim().toLowerCase());
+       //setResetToken(token);
+
+       // Navigate 
+       router.push({
         pathname: '/auth/forgotPasswordVerificationScreen',
-        params: { email }
-      });
-    } catch (error) {
-      console.error('Failed to send OTP:', error);
-      setEmailError('Failed to send OTP. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+        params: { email: email.trim().toLowerCase()  }
+       });
+     } catch (error: any) {
+       showErrorToast(error.message || 'Failed to send OTP. Please try again.');
+     } finally {
+       setIsLoading(false);
+     }
   };
+
 
   const handleBack = () => {
     router.back();
