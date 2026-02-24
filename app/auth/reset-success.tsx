@@ -134,6 +134,7 @@ const ResetSuccessScreen: React.FC<SuccessScreenProps> = ({ onComplete }) => {
         ]).start();
         });
     }, 100);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
  

@@ -13,20 +13,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
+import { useVerifyOtp } from '../hooks/auth';
 import { FONT_SIZES } from '../constants/typography';
-import { useAuth } from '../context/AuthContext';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
 import AuthButton from '../reusables/AuthButton';
-import { showErrorToast } from '../utils/toast';
 
 const ForgotPasswordVerificationScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const email = params.email as string;
-  const { verifyOtp } = useAuth();
+  const { mutate : verifyOtp, isPending } = useVerifyOtp();
   
   const [otp, setOtp] = useState(['', '', '', '']);
-  const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleOtpChange = (value: string, index: number) => {
@@ -50,33 +48,26 @@ const ForgotPasswordVerificationScreen: React.FC = () => {
     }
   };
 
-  const handleVerify = async () => {
+  const handleVerify = () => {
     const otpCode = otp.join('');
     if (otpCode.length !== 4) return;
-
-    setIsLoading(true);
-    try {
-     await verifyOtp(email, otpCode);
-      
-      // Navigate to reset password screen
-      router.push({
-        pathname: '/auth/reset-password',
-        params: { email, otpCode } // Pass otpCode 
-      });
-    } catch (error: any) {
-     showErrorToast(error.message || 'OTP verification failed');
-    } finally {
-      setIsLoading(false);
-    }
+    verifyOtp({ email, otp: otpCode });
   };
 
   const handleBack = () => {
     router.back();
   };
 
-  const isVerifyDisabled = otp.some((digit) => !digit) || isLoading;
+  const isVerifyDisabled = otp.some((digit) => !digit) || isPending;
 
-  const maskedEmail = email || 'gol***th@gmail.com';
+  const maskEmail = (emailStr: string): string => {
+    if (!emailStr || !emailStr.includes('@')) return emailStr;
+    const [username, domain] = emailStr.split('@');
+    const maskedUsername = username.substring(0, 3) + '***' + username.slice(-2);
+    return `${maskedUsername}@${domain}`;
+  };
+
+  const maskedEmail = email ? maskEmail(email) : 'No email provided';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -137,8 +128,8 @@ const ForgotPasswordVerificationScreen: React.FC = () => {
             <AuthButton
               title="Verify"
               onPress={handleVerify}
-              disabled={isVerifyDisabled || isLoading}
-              loading={isLoading}
+              disabled={isVerifyDisabled}
+              loading={isPending}
             />
           </View>
         </View>

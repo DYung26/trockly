@@ -14,22 +14,26 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BORDER_RADIUS, SPACING } from '../constants/layout';
 import { colors } from '../constants/theme';
+import { useSignup } from '../hooks/auth';
+import { signupSchema } from '../schemas/auth.schema';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 import { CustomInput } from '../reusables/CustomInput';
-import { useAuth } from '../context/AuthContext';
 import DividerWithText from '../reusables/DividerLine';
 import ThemedText from '../reusables/ThemedText';
 import AuthButton from '../reusables/AuthButton';
-import { showErrorToast, showSuccessToast } from '../utils/toast';
 
 interface ValidationErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phoneNumber?: string;
   password?: string;
   confirmPassword?: string;
 }
 
 const SignupScreen: React.FC = () => {
   const router = useRouter();
-  const { signup } = useAuth();
+  const { mutate: signup, isPending } = useSignup();
   const [firstName, setFirstName] = useState('');
 const [lastName, setLastName] = useState('');
 const [phoneNumber, setPhoneNumber] = useState('');
@@ -39,7 +43,6 @@ const [phoneNumber, setPhoneNumber] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
   const validatePasswords = () => {
@@ -72,37 +75,26 @@ const [phoneNumber, setPhoneNumber] = useState('');
     }
   };
 
-const handleCreateAccount = async () => {
-  if (!validatePasswords()) return;
-  
-  setIsLoading(true);
-  try {
-    await signup({
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.trim().toLowerCase(),
-      phoneNumber: phoneNumber.trim(),
-      password: password,
-      role: 'trockler'
+const handleCreateAccount = () => {
+  const result = signupSchema.safeParse({
+    firstName, lastName, email, phoneNumber, password, confirmPassword,
+  });
+
+  if (!result.success) {
+    const errors = result.error.flatten().fieldErrors;
+    setValidationErrors({
+      firstName: errors.firstName?.[0],
+      lastName: errors.lastName?.[0],
+      email: errors.email?.[0],
+      phoneNumber: errors.phoneNumber?.[0],
+      password: errors.password?.[0],
+      confirmPassword: errors.confirmPassword?.[0],
     });
-
-    showSuccessToast('Account Created. Please check your email to verify your account.');
-    
-    // Navigate after showing toast
-    setTimeout(() => {
-      router.push({
-        pathname: '/auth/OTPVerification',
-        params: { email: email.trim().toLowerCase() }
-      });
-    }, 1500);
-
-  } catch (error: any) {
-     showErrorToast(
-      error.message || 'Failed to create account. Please try again.'
-    );
-  } finally {
-    setIsLoading(false);
+    return;
   }
+
+  const { confirmPassword: _, ...signupData } = result.data;
+  signup({ ...signupData, role: 'trockler' });
 };
 
   return (
@@ -132,7 +124,8 @@ const handleCreateAccount = async () => {
                 label="First Name"
                 placeholder="Enter first name"
                 value={firstName}
-                onChangeText={setFirstName}
+                onChangeText={(text) => { setFirstName(text); setValidationErrors(p => ({...p, firstName: undefined})); }}
+                error={validationErrors.firstName} 
               />
             </View>
             <View style={styles.inputContainer}>
@@ -140,7 +133,8 @@ const handleCreateAccount = async () => {
                 label="Last Name"
                 placeholder="Enter last name"
                 value={lastName}
-                onChangeText={setLastName}
+                onChangeText={(text) => { setLastName(text); setValidationErrors(p => ({...p, lastName: undefined})); }}
+                error={validationErrors.lastName} 
                 />
              </View>
              <View style={styles.inputContainer}>
@@ -148,8 +142,12 @@ const handleCreateAccount = async () => {
                 label="Phone Number"
                 placeholder="E.g +234 800 000 0000"
                 value={phoneNumber}
-                onChangeText={setPhoneNumber}
+                onChangeText={(text) => {
+                  setPhoneNumber(text.replace(/\s/g, ''));
+                  setValidationErrors(p => ({...p, phoneNumber: undefined}));
+                }}
                 keyboardType="phone-pad"
+                error={validationErrors.phoneNumber} 
               />
             </View>
             {/* Email Input */}
@@ -158,9 +156,10 @@ const handleCreateAccount = async () => {
               label="Email"
               placeholder="E.g golibefelath@gmail.com"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => { setEmail(text); setValidationErrors(p => ({...p, email: undefined})); }}
               keyboardType="email-address"
               autoCapitalize="none"
+              error={validationErrors.email}  
              />
             </View>
 
@@ -170,8 +169,9 @@ const handleCreateAccount = async () => {
                 label="Password"
                 placeholder="Enter password"
                 value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
+                 onChangeText={(text) => { setPassword(text); setValidationErrors(p => ({...p, password: undefined})); }}
+                 error={validationErrors.password} 
+                 secureTextEntry={!showPassword}
                 rightIcon={
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                     <Ionicons
@@ -233,8 +233,8 @@ const handleCreateAccount = async () => {
             <AuthButton
                title="Create an account"
                onPress={handleCreateAccount}
-               disabled={!isSignupEnabled() || isLoading}
-               loading={isLoading}
+               disabled={!isSignupEnabled() || isPending}
+               loading={isPending}
                style={[
                 styles.createButton,
                 isSignupEnabled() && styles.createButtonActive

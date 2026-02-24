@@ -7,10 +7,8 @@ import {
   Image, 
   StyleSheet,
   KeyboardAvoidingView,
-  Keyboard,
-  TouchableWithoutFeedback,
   Platform
-, useColorScheme } from 'react-native';
+ } from 'react-native';
 import Button from '../reusables/PostButton';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,7 +33,6 @@ interface CreateTradeProps {
  onUpdate, 
  onPreview,
 }) => {
-  const colorScheme = useColorScheme();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [dayOpen, setDayOpen] = useState(false);
   const [timeOpen, setTimeOpen] = useState(false);
@@ -71,7 +68,7 @@ interface CreateTradeProps {
         });
       }
      } catch (error) {
-       alert('Failed to pick image. Please try again.');
+       alert('Failed to pick image. Please try again.',);
      }
   };
 
@@ -89,14 +86,16 @@ interface CreateTradeProps {
     <KeyboardAvoidingView
        style={{ flex: 1 }}
        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-       keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+       keyboardVerticalOffset={Platform.OS === 'ios' ? 160 : 0}
     >
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}> 
-     <View style={styles.screenContainer}>
+   <View style={styles.screenContainer}>
       <ScrollView 
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        automaticallyAdjustKeyboardInsets={true}
+        automaticallyAdjustContentInsets={false}
       >
         <ThemedText variant='preferenceTitle'>Create an Item</ThemedText>
         
@@ -334,7 +333,6 @@ interface CreateTradeProps {
       </View>
       </View>
     </View>
-    </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };
@@ -347,7 +345,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: SPACING.xl,
-    paddingBottom: 120,
+    paddingBottom: 250,
+   // paddingBottom: 120,
   },
   availabilityWrapper: {
    flexDirection: 'row',
@@ -539,6 +538,7 @@ const styles = StyleSheet.create({
    backgroundColor: colors.white,
    borderTopWidth: 1,
    borderTopColor: '#E5E7EB',
+   paddingBottom: Platform.OS === 'ios' ? 20 : 0,
   },
   buttonContainer: {
     paddingVertical: 15,

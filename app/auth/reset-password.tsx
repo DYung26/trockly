@@ -11,36 +11,30 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../constants/theme';
+import { useResetPassword } from '../hooks/auth';
 import ThemedText from '../reusables/ThemedText';
-import { useAuth } from '../context/AuthContext';
+import { resetPasswordSchema } from '../schemas/auth.schema';
 import { FONT_SIZES } from '../constants/typography';
 import { SPACING } from '../constants/layout';
 import AuthButton from '../reusables/AuthButton';
 import { CustomInput } from '../reusables/CustomInput';
 import { Ionicons } from '@expo/vector-icons';
-import { showErrorToast } from '../utils/toast';
 
 const ResetPasswordScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const email = params.email as string;
   const otpCode = params.otpCode as string;
-  const resetToken = params.resetToken as string;
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const {  resetPassword } = useAuth();
+  const { mutate: resetPassword, isPending } = useResetPassword();
   const [newPasswordError, setNewPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const validatePassword = (password: string): boolean => {
-    // Minimum 8 characters, at least one letter and one number
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
-    return passwordRegex.test(password);
-  };
+ 
 
   const handleNewPasswordChange = (text: string) => {
     setNewPassword(text);
@@ -56,53 +50,64 @@ const ResetPasswordScreen: React.FC = () => {
     }
   };
 
-  const handleResetPassword = async () => {
-    let hasError = false;
+  // const handleResetPassword = async () => {
+  //   let hasError = false;
 
-    // Validate new password
-    if (!newPassword.trim()) {
-      setNewPasswordError('Password is required');
-      hasError = true;
-    } else if (!validatePassword(newPassword)) {
-      setNewPasswordError('Password must be at least 8 characters with letters and numbers');
-      hasError = true;
+  //   // Validate new password
+  //   if (!newPassword.trim()) {
+  //     setNewPasswordError('Password is required');
+  //     hasError = true;
+  //   } else if (!validatePassword(newPassword)) {
+  //     setNewPasswordError('Password must be at least 8 characters with letters and numbers');
+  //     hasError = true;
+  //   }
+
+  //   // Validate confirm password
+  //   if (!confirmPassword.trim()) {
+  //     setConfirmPasswordError('Please confirm your password');
+  //     hasError = true;
+  //   } else if (newPassword !== confirmPassword) {
+  //     setConfirmPasswordError('Passwords do not match');
+  //     hasError = true;
+  //   }
+
+  //   if (hasError) return;
+
+  //   setIsLoading(true);
+  //   try {
+  //    await resetPassword(email, newPassword, otpCode);
+
+
+  //    setTimeout(() => {
+  //     router.push('/auth/reset-success');
+  //    }, 1500);
+  //   } catch (error: any) {
+  //      showErrorToast(error.message || 'Failed to reset password. Please try again.');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+
+  const handleResetPassword = () => {
+    const result = resetPasswordSchema.safeParse({ newPassword, confirmPassword });
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors;
+      setNewPasswordError(errors.newPassword?.[0] || '');
+      setConfirmPasswordError(errors.confirmPassword?.[0] || '');
+      return;
     }
-
-    // Validate confirm password
-    if (!confirmPassword.trim()) {
-      setConfirmPasswordError('Please confirm your password');
-      hasError = true;
-    } else if (newPassword !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match');
-      hasError = true;
-    }
-
-    if (hasError) return;
-
-    setIsLoading(true);
-    try {
-     await resetPassword(email, newPassword, otpCode);
-
-
-     setTimeout(() => {
-      router.push('/auth/reset-success');
-     }, 1500);
-    } catch (error: any) {
-       showErrorToast(error.message || 'Failed to reset password. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    resetPassword({ email, newPassword: result.data.newPassword, otp: otpCode });
   };
-
   const handleBack = () => {
     router.back();
   };
 
-  const isResetDisabled = 
-    !newPassword.trim() || 
-    !confirmPassword.trim() || 
-    newPassword !== confirmPassword ||
-    !validatePassword(newPassword);
+ const isResetDisabled =  
+   !newPassword.trim() || 
+   !confirmPassword.trim() || 
+   newPassword !== confirmPassword || 
+   isPending;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -180,8 +185,8 @@ const ResetPasswordScreen: React.FC = () => {
             <AuthButton
               title="Reset Password"
               onPress={handleResetPassword}
-              disabled={isResetDisabled || isLoading}
-              loading={isLoading}
+              disabled={isResetDisabled || isPending}
+              loading={isPending}
             />
           </View>
         </View>
@@ -205,9 +210,6 @@ const styles = StyleSheet.create({
   },
   keyboardView: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
   },
    content: {
     flex: 1,
@@ -251,9 +253,6 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     marginBottom: SPACING.md,
-  },
-  resetButton: {
-    marginTop: SPACING.md,
   },
   supportContainer: {
      flexDirection: 'row',
