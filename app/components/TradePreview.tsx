@@ -12,18 +12,20 @@ import { Ionicons } from '@expo/vector-icons';
 import Button from '../reusables/PostButton';
 import ThemedText from '../reusables/ThemedText';
 import { BORDER_RADIUS, SPACING } from '../constants/layout';
+import { useOfferStore } from '../store/offer.store';
+import { useCreateOffer } from '../hooks/offer';
 import { colors } from '../constants/theme';
-import { Trade } from '../types';
+//import { Trade } from '../types';
 
 interface TradePreviewProps {
-  trade: Trade;
-  onPublish: () => void;
   onBack: () => void;
 }
 
 const { width } = Dimensions.get('window');
 
- const TradePreview: React.FC<TradePreviewProps> = ({ trade, onPublish, onBack }) => {
+ const TradePreview: React.FC<TradePreviewProps> = ({  onBack }) => {
+  const { form } = useOfferStore();
+  const { mutate: submitOffer, isPending } = useCreateOffer();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleScroll = (event: any) => {
@@ -51,12 +53,12 @@ const { width } = Dimensions.get('window');
         showsVerticalScrollIndicator={false}
       >
         {/* Title */}
-        {trade.title ? (
-          <ThemedText variant='previewTitle'>{trade.title}</ThemedText>
+        {form.title ? (
+          <ThemedText variant='previewTitle'>{form.title}</ThemedText>
         ) : null}
 
         {/* Image Carousel */}
-        {trade.photos && trade.photos.length > 0 && (
+        {form.photos && form.photos.length > 0 && (
           <View style={styles.imageContainer}>
             <ScrollView
               horizontal
@@ -65,20 +67,20 @@ const { width } = Dimensions.get('window');
               onScroll={handleScroll}
               scrollEventThrottle={16}
             >
-              {trade.photos.map((photo, index) => (
+              {form.photos.map((photo, index) => (
                 <Image 
                   key={index}
-                  source={{ uri: photo }} 
+                  source={{ uri: photo.uri }} 
                   style={styles.carouselImage} 
                 />
               ))}
             </ScrollView>
             
             {/* Image Counter */}
-            {trade.photos.length > 1 && (
+            {form.photos.length > 1 && (
               <View style={styles.imageCounter}>
                 <Text style={styles.imageCounterText}>
-                  {currentImageIndex + 1}/{trade.photos.length}
+                  {currentImageIndex + 1}/{form.photos.length}
                 </Text>
               </View>
             )}
@@ -86,32 +88,46 @@ const { width } = Dimensions.get('window');
         )}
 
         {/* Description */}
-        {trade.description ? (
-          <ThemedText variant='tradeDescription'>{trade.description}</ThemedText>
+        {form.description ? (
+          <ThemedText variant='tradeDescription'>{form.description}</ThemedText>
         ) : null}
 
-        {/* Return Offer */}
-        {trade.returnOffer ? (
-            <ThemedText variant='returnOffer'>
-            I want {trade.returnOffer}
-          </ThemedText>
-        ) : null}
+        {/* Wants Section */}
+        {form.wants.filter(w => w.title.trim() !== '').length > 0 && (
+          <View style={styles.section}>
+            <ThemedText variant='inputLabel'>What  I want In Return</ThemedText>
+            {form.wants 
+              .filter(w => w.title.trim() !== '')
+              .map((want, index) => (
+                <View key={want.id} style={{ marginBottom: 8 }}>
+                  <ThemedText variant='tradeText'>
+                     {index + 1}. {want.title}
+                  </ThemedText>
+                  {want.description ? (
+                    <ThemedText variant='tradeDescription'>{want.description}</ThemedText>
+                  ): null}
+                </View>
+              ))
+            }
+          </View>
+        )}
+
 
         {/* Availability Section */}
-        {(trade.availability?.day || trade.availability?.time) && (
+        {(form.availability?.day || form.availability?.time) && (
           <View style={styles.section}>
             <ThemedText variant='inputLabel'>AVAILABILITY</ThemedText>
             <ThemedText variant='tradeText'>
-              {trade.availability.day} at {trade.availability.time || '9:00 AM'}
+              {form.availability.day} at {form.availability.time || '9:00 AM'}
             </ThemedText>
           </View>
         )}
 
         {/* Location Section */}
-        {trade.location ? (
+        {form.location ? (
           <View style={styles.section}>
             <ThemedText variant='inputLabel'>LOCATION</ThemedText>
-            <ThemedText variant='tradeText'>{trade.location}</ThemedText>
+            <ThemedText variant='tradeText'>{form.location}</ThemedText>
           </View>
         ) : null}
       </ScrollView>
@@ -119,7 +135,11 @@ const { width } = Dimensions.get('window');
       {/* Publish Button */}
       <View style={styles.fullWidthButtonWrapper}>
         <View style={styles.buttonContainer}>
-          <Button title="Publish" onPress={onPublish} />
+          <Button 
+            title={isPending ? 'Publishing...' : 'Publish'}
+            onPress={() => submitOffer()}
+            disabled={isPending}
+          />
         </View>
       </View>
     </View>
