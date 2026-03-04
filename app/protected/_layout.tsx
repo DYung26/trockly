@@ -12,21 +12,14 @@ import { colors } from '../constants/theme';
 import { BlurView } from 'expo-blur';
 import { SPACING  } from '../constants/layout';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
-import { Trade } from '../types';
 
 interface DashboardProps {
-    userProfile: {
-      name: string;
-      location: string;
-      photo: string;
-    };
-    trades: Trade[];
-    onCreatePost: () => void;
+  userProfile: { name: string; location: string; photo: string; };
+  onCreatePost: () => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
   userProfile,
-  trades,
   onCreatePost
 }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'posts' | 'inbox' | 'profile'>('home');
@@ -44,12 +37,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     switch (activeTab) {
       case 'home': 
         return (
-         <HomeScreen
-           trades={trades}
-           userProfile={userProfile}
-           onLike={handleLike}
-           onSkip={handleSkip}
-         />
+         <HomeScreen userProfile={userProfile} onLike={handleLike} onSkip={handleSkip} />
         );
         case 'posts': 
         return (

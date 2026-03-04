@@ -9,8 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  ScrollView,
-  Alert,
+  ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ThemedText from '../reusables/ThemedText';
@@ -22,18 +21,17 @@ import { useRouter } from 'expo-router';
 import DividerWithText from '../reusables/DividerLine';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
-import { useAuth } from '../context/AuthContext';
-import { validateLoginForm } from '../utils/validation';
-import { showErrorToast } from '../utils/toast';
+import { useLogin } from '../hooks/auth';
+import { loginSchema } from '../schemas/auth.schema';
 
 const LoginScreen: React.FC = () => {
   const router = useRouter();
-  const { login } = useAuth();
+  const { mutate: login, isPending } = useLogin();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  
   const [validationErrors, setValidationErrors] = useState<{
     email?: string;
     password?: string;
@@ -43,33 +41,18 @@ const LoginScreen: React.FC = () => {
     return !email.trim() || !password.trim();
   };
 
-  const handleLogin = async () => {
-    if (isLoading) return;
-
-    // Validate form
-    const errors = validateLoginForm(email, password);
-
-    if (Object.keys(errors).length > 0) {
-      setValidationErrors(errors);
-      const firstError = Object.values(errors)[0];
-      Alert.alert('Validation Error', firstError);
+  const handleLogin = () => {
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors;
+      setValidationErrors({
+        email: errors.email?.[0],
+        password: errors.password?.[0],
+      });
       return;
     }
-
-    setIsLoading(true);
-    try {
-      await login(email.trim().toLowerCase(), password);
-
-      // Navigate to onboarding or home after successful login
-      router.replace('/post-account/onboarding');
-    } catch (error: any) {
-     showErrorToast(
-      error.message || 'Invalid email or password. Please try again.'
-     );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    login(result.data);
+  }
 
   const clearFieldError = (field: 'email' | 'password') => {
     if (validationErrors[field]) {
@@ -155,8 +138,8 @@ const LoginScreen: React.FC = () => {
             <AuthButton
               title="Log In"
               onPress={handleLogin}
-              disabled={isLoginDisabled() || isLoading}
-              loading={isLoading}
+              disabled={isLoginDisabled() || isPending}
+              loading={isPending}
             />
 
             {/* Explore as Guest */}

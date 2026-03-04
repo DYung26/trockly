@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { 
   useFonts, 
   Poppins_400Regular, 
@@ -9,8 +9,15 @@ import {
 } from "@expo-google-fonts/poppins";
 import { ThemeProvider } from "./providers/ThemeProviders";
 import { ActivityIndicator, View } from "react-native";
+import { useAuthStore } from "./store/auth.store";
 import Toast from "react-native-toast-message";
-import { AuthProvider } from "./context/AuthContext";
+import { QueryProvider } from "./providers/queryProvider";
+
+function AuthInitializer({ children }: { children: React.ReactNode }) {
+  const loadAuthData = useAuthStore((s) => s.loadAuthData);
+  useEffect(() => { loadAuthData(); }, []);
+  return <>{children}</>;
+}
 
 const RootLayout = () => {
   const [fontsLoaded] = useFonts({
@@ -30,8 +37,9 @@ const RootLayout = () => {
 
   return (
     <ThemeProvider>
-     <AuthProvider>
-       <Stack>
+     <QueryProvider>
+        <AuthInitializer>
+          <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="auth/create-account" options={{ headerShown: false }} />
         <Stack.Screen name="auth/login" options={{ headerShown: false }} />
@@ -47,7 +55,8 @@ const RootLayout = () => {
         <Stack.Screen name="Dashboard/dashboard" options={{ headerShown: false  }} />
       </Stack>
        <Toast />
-     </AuthProvider>
+     </AuthInitializer>
+     </QueryProvider>
     </ThemeProvider>
   );
 };

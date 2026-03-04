@@ -15,7 +15,7 @@ import ThemedText from '../reusables/ThemedText';
 import { FONT_SIZES } from '../constants/typography';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
 import AuthButton from '../reusables/AuthButton';
-import { useAuth } from '../context/AuthContext';
+import { useVerifyEmail } from '../hooks/auth';
 import { showErrorToast } from '../utils/toast';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
@@ -24,12 +24,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 
 const OTPVerificationScreen: React.FC = () => {
    const router = useRouter();
-  const { verifyEmail } = useAuth();
+   const { mutate: verifyEmail, isPending } = useVerifyEmail();
   const params = useLocalSearchParams<{ email: string }>();
   const email = Array.isArray(params.email) ? params.email[0] : params.email;
   
-  const [otp, setOtp] = useState(['', '', '', '',]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleOtpChange = (value: string, index: number) => {
@@ -53,34 +52,20 @@ const OTPVerificationScreen: React.FC = () => {
     }
   };
 
-  const handleVerify = async () => {
-    const otpCode = otp.join('');
-    if (otpCode.length !== 4) return;
+ 
+  const handleVerify = () => {
+  const otpCode = otp.join('');
+  if (otpCode.length !== 4) return;
+  
+  if (!email) {
+    showErrorToast('Email not found. Please go back and try again.');
+    return;
+  }
+  
+  verifyEmail({ email, otp: otpCode });
+};
 
-    if (!email) {
-      showErrorToast('Email is required for verification');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await verifyEmail(email, otpCode);
-      
-      setTimeout(() => {
-        router.push('/auth/success');
-      }, 1500);
-    } catch (error: any) {
-      console.error('OTP verification failed:', error);
-      showErrorToast(
-        error.message || 'Invalid OTP. Please try again.'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-
-  const isVerifyDisabled = otp.some((digit) => !digit) || isLoading;
+  const isVerifyDisabled = otp.some((digit) => !digit) || isPending;
 
   
 
@@ -151,11 +136,9 @@ const maskedContact = email ? maskEmail(email) : 'No email provided';
             {/* Verify Button */}
            <AuthButton
             title="Verify"
-            onPress={async () => {
-              await handleVerify();
-            }}
-            disabled={isVerifyDisabled || isLoading}
-            loading={isLoading}
+            onPress={handleVerify}
+            disabled={isVerifyDisabled}
+            loading={isPending}
            />
 
             {/* Contact Support */}

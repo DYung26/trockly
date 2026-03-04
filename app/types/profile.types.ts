@@ -28,3 +28,30 @@ export interface Review {
     comment: string;
     itemName: string;
 }
+
+export interface CreateTrocklerProfileRequest {
+    username: string;
+    phoneNumber: string;
+    preferences: string[];
+    swapRadiusKm: number;
+    address: string;
+    profilePhotoId?: string; // fieldId from upload 
+}
+
+export interface TrocklerProfile {
+    id: string;
+    username: string;
+    phoneNumber: string;
+    preferences: string[];
+    swapRadiusKm: number;
+    address: string;
+    profilePhoto?: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface CreateTrocklerProfileResponse {
+    statusCode: number;
+    message: string;
+    data: TrocklerProfile;
+}

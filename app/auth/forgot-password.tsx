@@ -14,23 +14,17 @@ import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
 import { FONT_SIZES } from '../constants/typography';
 import { SPACING } from '../constants/layout';
-import { useAuth } from '../context/AuthContext';
 import AuthButton from '../reusables/AuthButton';
-import { showErrorToast } from '../utils/toast';
+import { useForgotPassword } from '../hooks/auth';
+import { forgotPasswordSchema } from '../schemas/auth.schema';
 import { CustomInput } from '../reusables/CustomInput';
 
 const ForgotPasswordScreen: React.FC = () => {
   const router = useRouter();
-  const { forgotPassword } = useAuth();
-  //const [resetToken, setResetToken] = useState('');
+  const { mutate: forgotPassword, isPending } = useForgotPassword();
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const validateEmail = (text: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(text);
-  };
 
   const handleEmailChange = (text: string) => {
     setEmail(text);
@@ -40,32 +34,13 @@ const ForgotPasswordScreen: React.FC = () => {
   };
 
 
-  const handleContinue = async () => {
-     if (!email.trim()) {
-       setEmailError('Email is required');
-       return;
-     }
-
-     if (!validateEmail(email)) {
-       setEmailError('Please enter a valid email address');
-       return;
-     }
-
-     setIsLoading(true);
-     try {
-       await forgotPassword(email.trim().toLowerCase());
-       //setResetToken(token);
-
-       // Navigate 
-       router.push({
-        pathname: '/auth/forgotPasswordVerificationScreen',
-        params: { email: email.trim().toLowerCase()  }
-       });
-     } catch (error: any) {
-       showErrorToast(error.message || 'Failed to send OTP. Please try again.');
-     } finally {
-       setIsLoading(false);
-     }
+  const handleContinue = () => {
+    const result = forgotPasswordSchema.safeParse({ email });
+    if (!result.success) {
+      setEmailError(result.error.flatten().fieldErrors.email?.[0] || '');
+      return;
+    }
+    forgotPassword({ email: result.data.email });
   };
 
 
@@ -73,7 +48,7 @@ const ForgotPasswordScreen: React.FC = () => {
     router.back();
   };
 
-  const isContinueDisabled = !email.trim() || !validateEmail(email);
+ const isContinueDisabled = !email.trim() || isPending;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -119,20 +94,17 @@ const ForgotPasswordScreen: React.FC = () => {
          <AuthButton
            title="Continue"
            onPress={handleContinue}
-           disabled={isContinueDisabled || isLoading}
-           loading={isLoading}
+           disabled={isContinueDisabled || isPending}
+           loading={isPending}
          />
        </View>
-       <View>
-
-        {/* Contact Support */ }
+       {/* Contact Support */ }
         <View style={styles.supportContainer}>
            <Text style={styles.supportText}>Need help? </Text>
           <TouchableOpacity>
             <Text style={styles.supportLink}>Contact support</Text>
          </TouchableOpacity>
       </View>
-       </View>
       </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

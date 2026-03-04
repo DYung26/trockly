@@ -79,7 +79,6 @@ export default function MainLayout() {
   return (
     <Dashboard
       userProfile={userProfile}
-      trades={trades}
       onCreatePost={handleCreatePost}
     />
   );

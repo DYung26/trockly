@@ -41,20 +41,26 @@ export interface ValidationErrors {
     confirmPassword?: string;
 }
 
-export interface AuthContextType {
-    user: User | null;
-    accessToken: string |  null;
-    isLoading: boolean;
-    isAuthenticated: boolean;
-    login: (email: string, password: string) => Promise<void>;
-    signup: (data: SignupRequest) => Promise<AuthResponse>;
-    verifyEmail: (email: string, otp: string) => Promise<void>;
-    forgotPassword: (email: string) => Promise<void>;
-    verifyOtp: (email: string, otp: string) => Promise<void>;
-    resetPassword: (email: string, newPassword: string, otp: string) => Promise<void>;
-    logout: () => Promise<void>;
-    checkAuth: () => Promise<void>;
+export interface ApiSuccessResponse<T = undefined> {
+  statusCode: number;
+  message: string;
+  data: T;
 }
+
+// export interface AuthContextType {
+//     user: User | null;
+//     accessToken: string |  null;
+//     isLoading: boolean;
+//     isAuthenticated: boolean;
+//     login: (email: string, password: string) => Promise<void>;
+//     signup: (data: SignupRequest) => Promise<AuthResponse>;
+//     verifyEmail: (email: string, otp: string) => Promise<void>;
+//     forgotPassword: (email: string) => Promise<void>;
+//     verifyOtp: (email: string, otp: string) => Promise<void>;
+//     resetPassword: (email: string, newPassword: string, otp: string) => Promise<void>;
+//     logout: () => Promise<void>;
+//     checkAuth: () => Promise<void>;
+// }
 
 export interface VerifyEmailRequest {
     email: string;

@@ -10,32 +10,29 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Platform
-, useColorScheme } from 'react-native';
+ } from 'react-native';
 import Button from '../reusables/PostButton';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
+import { useOfferStore } from '../store/offer.store';
+import { useCreateOffer } from '../hooks/offer';
+import type { LocalPhoto, OfferCategory } from '../types/offer.types';
 import ThemedText from '../reusables/ThemedText';
 import { CustomInput } from '../reusables/CustomInput';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
 import { colors } from '../constants/theme';
-import { Trade } from '../types';
-import { CATEGORIES, DAYS  } from '../constants/data';
+import {  DAYS  } from '../constants/data';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 
+export const CATEGORIES: OfferCategory[] = ['object', 'service', 'food'];
 
 interface CreateTradeProps {
-  trade: Trade;
-  onUpdate: (trade: Trade) => void;
   onPreview: () => void;
 }
 
-
  const CreateTrade: React.FC<CreateTradeProps> = ({ 
- trade, 
- onUpdate, 
  onPreview,
 }) => {
-  const colorScheme = useColorScheme();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [dayOpen, setDayOpen] = useState(false);
   const [timeOpen, setTimeOpen] = useState(false);
@@ -47,46 +44,53 @@ interface CreateTradeProps {
   '08:00 PM', '09:00 PM'
 ];
 
+const {
+  form,
+  setCategory, setTitle, setDescription,
+  setLocation, setUseCurrentLocation,
+  setAvailabilityDay, setAvailabilityTime,
+  addPhoto, removePhoto,
+  addWant, removeWant, updateWant,
+} = useOfferStore();
 
-  const handlePhotoAdd = async () => {
-     try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-        allowsMultipleSelection: false,
-       // presentationStyle: 'pageSheet',
-        ...(Platform.OS === 'ios' && {
-          videoExportPreset: ImagePicker.VideoExportPreset.HighestQuality,
-        })
-      });
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const selectedImage = result.assets[0];
-
-        onUpdate({
-            ...trade,
-            photos: [...trade.photos, selectedImage.uri],
-        });
-      }
-     } catch (error) {
-       alert('Failed to pick image. Please try again.');
-     }
-  };
-
-  const handleRemovePhoto = (uri: string) => {
-    const updatedPhotos = trade.photos.filter((photo) => photo !== uri);
-    onUpdate({ ...trade, photos: updatedPhotos });
-  };
+const { mutate: submitOffer, isPending } = useCreateOffer();
 
 
 
-  const isFormValid = 
-    trade.category && trade.title && trade.photos.length > 0 && trade.availability.day;
+const handlePhotoAdd = async () => {
+  try {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+      allowsMultipleSelection: false,
+      ...(Platform.OS === 'ios' && {
+        videoExportPreset: ImagePicker.VideoExportPreset.HighestQuality,
+      }),
+    });
+
+    if (!result.canceled && result.assets?.length > 0) {
+      const img = result.assets[0];
+      const photo: LocalPhoto = {
+        uri: img.uri,
+        mimeType: img.mimeType ?? 'image/jpeg',
+        size: img.fileSize ?? 0,
+        uploaded: false,
+      };
+      addPhoto(photo);
+    }
+  } catch {
+    alert('Failed to pick image. Please try again.');
+  }
+};
+
+ const handleRemovePhoto = (uri: string) => removePhoto(uri);
+
+  const isFormValid = form.category && form.title && form.photos.length > 0 && form.availability.day;
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAvoidingView 
        style={{ flex: 1 }}
        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
@@ -113,7 +117,7 @@ interface CreateTradeProps {
               activeOpacity={0.8}
             >
              <Text style={styles.dropdownText}>
-                {trade.category || 'Select Category'}
+                {form.category || 'Select Category'}
              </Text>
              <Ionicons
                name={categoryOpen ? 'chevron-up' : 'chevron-down'}
@@ -128,7 +132,7 @@ interface CreateTradeProps {
                    key={cat}
                    style={styles.dropdownItem}
                    onPress={() => {
-                     onUpdate({ ...trade, category: cat });
+                     setCategory(cat as OfferCategory);
                      setCategoryOpen(false);
                    }}
                  >
@@ -142,8 +146,8 @@ interface CreateTradeProps {
         {/* --- Title Input --- */}
          <CustomInput
            label="Title"
-           value={trade.title}
-           onChangeText={(text) => onUpdate({ ...trade, title: text })}
+           value={form.title}
+           onChangeText={(text) => setTitle(text)}
            placeholder="E.g A Home-Sewing Kit"
            maxLength={140}
          />
@@ -152,7 +156,7 @@ interface CreateTradeProps {
        <View style={styles.inputContainer}>
         <View style={styles.photoHeaderRow}>
        <ThemedText variant='h3'>Add Trade Photos</ThemedText>
-    {trade.photos.length > 0 && (
+      {form.photos.length > 0 && (
       <TouchableOpacity 
         style={styles.uploadImagesButton} 
         onPress={handlePhotoAdd}
@@ -164,7 +168,7 @@ interface CreateTradeProps {
     )}
   </View>
 
-  {trade.photos.length === 0 ? (
+  {form.photos.length === 0 ? (
     <TouchableOpacity style={styles.uploadBox} onPress={handlePhotoAdd}>
       <Image 
         source={require('../../assets/images/sect-action.png')}
@@ -173,13 +177,18 @@ interface CreateTradeProps {
       <ThemedText variant='uploadText'>Upload your images</ThemedText>
     </TouchableOpacity>
   ) : (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12}}>
-      {trade.photos.map((uri, index) => (
+    <ScrollView 
+      horizontal 
+      showsHorizontalScrollIndicator={false} 
+      style={{ marginTop: 12}}
+      contentContainerStyle={{paddingRight: SPACING.md}} 
+      >
+      {form.photos.map((photo, index) => (
         <View key={index} style={styles.photoWrapper}>
-          <Image source={{ uri }} style={styles.tradePhoto} />
+          <Image source={{ uri: photo.uri }} style={styles.tradePhoto} />
           <TouchableOpacity
             style={styles.removeButton}
-            onPress={() => handleRemovePhoto(uri)}
+            onPress={() => handleRemovePhoto(photo.uri)}
           >
             <Ionicons name="close" size={18} color={colors.white} />
           </TouchableOpacity>
@@ -192,23 +201,45 @@ interface CreateTradeProps {
          {/* --- Trade Description --- */ }
          <CustomInput
            label="Trade Description"
-           value={trade.description}
-           onChangeText={(text) => onUpdate({ ...trade, description: text })}
+           value={form.description}
+           onChangeText={(text) => setDescription(text)}
            placeholder="Share details about what you're offering..."
            maxLength={340}
            multiline
            numberOfLines={4}
          />
-        <Text style={styles.characterCount}>{trade.description.length}/340 words</Text>
+        <Text style={styles.characterCount}>{form.description.length}/340 words</Text>
 
+        <ThemedText variant='h3'>What do you want in return?</ThemedText>
 
-        {/* --- What do you want in return? --- */}
-        <CustomInput
-           label="What do you want in return?"
-           value={trade.returnOffer || ''}
-           onChangeText={(text) => onUpdate({ ...trade, returnOffer: text })}
-           placeholder="E.g Cleaning service, gift card, etc"
-         />
+        {form.wants.map((want, index) => (
+         <View key={want.id} style={{ marginBottom: 12 }}>
+          <CustomInput
+            label={`Want ${index + 1}`}
+            value={want.title}
+            onChangeText={(text) => updateWant(want.id, { title: text })}
+            placeholder="E.g MacBook Air, Cleaning Service..."
+          />
+
+         <CustomInput
+           label="Description (optional)"
+           value={want.description}
+           onChangeText={(text) => updateWant(want.id, { description: text })}
+           placeholder="Any specific details..."
+          />
+
+        {form.wants.length > 1 && (
+         <TouchableOpacity onPress={() => removeWant(want.id)}>
+          <Text style={{ color: '#EF4444', fontSize: 13, marginTop: 4 }}>Remove</Text>
+         </TouchableOpacity>
+        )}
+      </View>
+    ))}
+
+     <TouchableOpacity onPress={addWant} style={{ marginBottom: 20 }}>
+       <Text style={{ color: '#3B82F6', fontSize: 14, fontWeight: '600' }}>+ Add another want</Text>
+     </TouchableOpacity>
+
 
          {/* Availability */ }
          <ThemedText variant='inputLabel'>AVAILABILITY</ThemedText>
@@ -224,7 +255,7 @@ interface CreateTradeProps {
              }}
            >
             <Text style={styles.dropdownText}>
-                {trade.availability.day || 'Select'}
+                {form.availability.day || 'Select'}
             </Text>
             <Ionicons
              name={dayOpen ? 'chevron-up' : 'chevron-down'}
@@ -245,10 +276,7 @@ interface CreateTradeProps {
                    key={day}
                    style={styles.dropdownItem}
                    onPress={() => {
-                     onUpdate({
-                      ...trade,
-                      availability: { ...trade.availability, day },
-                     });
+                     setAvailabilityDay(day)
                      setDayOpen(false);
                    }}
                  >
@@ -271,7 +299,7 @@ interface CreateTradeProps {
               }}
             > 
              <Text style={styles.dropdownText}>
-              {trade.availability.time || 'Select'}
+              {form.availability.time || 'Select'}
              </Text>
              <Ionicons name="time-outline" size={20}  color="#777A84" />
             </TouchableOpacity>
@@ -288,10 +316,7 @@ interface CreateTradeProps {
                   key={time}
                   style={styles.dropdownItem}
                   onPress={() => {
-                    onUpdate({
-                      ...trade,
-                      availability: { ...trade.availability, time }
-                    });
+                    setAvailabilityTime(time)
                     setTimeOpen(false);
                   }}
                 >
@@ -307,14 +332,14 @@ interface CreateTradeProps {
 
         <CustomInput
           label="Location"
-          value={trade.location}
-          onChangeText={(text) => onUpdate({ ...trade, location: text })}
+          value={form.location}
+          onChangeText={(text) => setLocation(text)}
           placeholder="Ifako-Ijaye, lagos"
         />
 
         <TouchableOpacity
           style={styles.checkboxContainer}
-          onPress={() => onUpdate({ ...trade, useCurrentLocation: !trade.useCurrentLocation })}
+          onPress={() => setUseCurrentLocation(!form.useCurrentLocation)}
           activeOpacity={0.7}
         >
          <Image 
@@ -330,7 +355,12 @@ interface CreateTradeProps {
 
       <View style={styles.fullWidthButtonWrapper}>
          <View style={styles.buttonContainer}>
-        <Button title="Preview" onPress={onPreview} disabled={!isFormValid} />
+           <Button 
+             title={isPending ? 'Posting...' : 'Post Trade'}
+             onPress={onPreview}
+            disabled={!isFormValid}
+           />
+          {/* <Button title={isPending ? 'Posting...' : 'Post Trade'} onPress={() => submitOffer()} disabled={!isFormValid || isPending} /> */}
       </View>
       </View>
     </View>

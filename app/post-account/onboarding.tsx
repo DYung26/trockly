@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { View, StatusBar, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Profile, Preference } from '../types/index';
 import Swiper from 'react-native-swiper';
 
-import { Profile, Preference, Trade } from '../types/index';
 
 import { PREFERENCES } from '../constants/data';
 
@@ -31,16 +31,6 @@ const Onboarding: React.FC = () => {
   });
   const [preferences, setPreferences] = useState<Preference[]>(PREFERENCES);
   const [swapDistance, setSwapDistance] = useState(4);
-  const [trade, setTrade] = useState<Trade>({
-    category: '',
-    title: '',
-    photos: [],
-    returnOffer: '',
-    description: '',
-    availability: { day: '', time: '' },
-    location: '',
-    useCurrentLocation: false,
-  });
   const [showPreview, setShowPreview] = useState(false);
 
   // Handlers
@@ -91,9 +81,7 @@ const Onboarding: React.FC = () => {
 
      {showPreview ? (
        <TradePreview
-            trade={trade}
-            onPublish={handlePublish}
-            onBack={() => setShowPreview(false)}
+           onBack={() => setShowPreview(false)}
           />
      ): (
      <Swiper
@@ -127,7 +115,7 @@ const Onboarding: React.FC = () => {
           onDistanceChange={setSwapDistance}
           onContinue={handleNext}
         />
-        <CreateTrade trade={trade} onUpdate={setTrade} onPreview={() => setShowPreview(true)} />
+        <CreateTrade onPreview={() => setShowPreview(true)} />
       </Swiper>
      )}
     </SafeAreaView>
