@@ -2,7 +2,6 @@ export interface SignupRequest {
     firstName: string;
     lastName: string;
     email: string;
-    phoneNumber: string;
     password: string;
     role: 'trockler'
 }
@@ -36,7 +35,6 @@ export interface ValidationErrors {
     firstName?: string;
     lastName?: string;
     email?: string;
-    phoneNumber?: string;
     password?: string;
     confirmPassword?: string;
 }
@@ -68,11 +66,11 @@ export interface VerifyEmailRequest {
 }
 
 export interface VerifyEmailResponse {
-    statusCode: number;
-    message: string;
-    data?: {
-        isVerified: boolean;
-    }
+  statusCode: number;
+  message: string;
+  data: User & {
+    accessToken: string;
+  };
 }
 
 export interface ForgotPasswordRequest {

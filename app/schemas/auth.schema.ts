@@ -5,9 +5,6 @@ export const signupSchema = z
     firstName: z.string().min(2, 'First name must be at least 2 characters'),
     lastName: z.string().min(2, 'Last name must be at least 2 characters'),
     email: z.string().email('Please enter a valid email address'),
-    phoneNumber: z
-      .string()
-      .regex(/^\+234[7-9][0-1]\d{8}$/, 'Enter a valid Nigerian number (+234XXXXXXXXXX)'),
     password: z
       .string()
       .min(8, 'Password must be at least 8 characters')
