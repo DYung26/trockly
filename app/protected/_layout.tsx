@@ -8,10 +8,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HomeScreen } from './Home/home';
+import { PostScreen } from './Post/post';
 import { colors } from '../constants/theme';
 import { BlurView } from 'expo-blur';
 import { SPACING  } from '../constants/layout';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
+import CreateTrade from '../components/CreateTrade';
 
 interface DashboardProps {
   userProfile: { name: string; location: string; photo: string; };
@@ -41,11 +43,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         );
         case 'posts': 
         return (
-         <View style={styles.placeholderContainer}>
-           <Ionicons name="file-tray-stacked-outline" size={60} color="#9CA3AF" /> 
-           <Text style={styles.placeholderText}>Posts Screen</Text>
-           <Text style={styles.placeholderSubtext}>View and manage your trades</Text>
-         </View>
+         <PostScreen  />
         );
       case 'inbox': 
        return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
  View, 
  Text, 
@@ -19,10 +19,12 @@ import { colors } from '../constants/theme';
 import { SPACING } from '../constants/layout';
 import ThemedText from '../reusables/ThemedText';
 import { CustomInput } from '../reusables/CustomInput';
+import { useProfileStore } from '../store/profile.store';
 import { Ionicons } from '@expo/vector-icons';
 import CountryCodePicker, { Country } from './CountryCodePicker';
 import { FONT_SIZES, FONT_WEIGHTS } from '../constants/typography';
 import { countriesData } from '../data/world-country';
+import { showErrorToast } from '../utils/toast';
 
 
 interface CompleteProfileProps {
@@ -38,9 +40,10 @@ interface CompleteProfileProps {
 }) => {
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '']);
-  const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber || '');
   const [userName, setUserName] = useState(profile.username || '');
-  const [bio, setBio] = useState(profile.bio || '');
+  const [phoneNumber, setPhoneNumberLocal] = useState(profile.phoneNumber || '');
+  const [bio, setBioLocal] = useState(profile.bio || '');
+  const { setPhoneNumber, setUsername, setBio, setPhoto } = useProfileStore();
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<Country>(
      countriesData.find((c) => c.code === 'NG') || countriesData[0]
@@ -57,16 +60,6 @@ interface CompleteProfileProps {
   setPhoneError(null);
   return true;
 };
-
-
-  useEffect(() => {
-    onUpdate({
-        ...profile,
-        phoneNumber,
-        username: userName,
-        bio
-    });
-  }, [phoneNumber, userName, bio]);
  
 
   const handlePhotoUpload = async () => {
@@ -80,15 +73,15 @@ interface CompleteProfileProps {
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        const selectedImage = result.assets[0];
-        
-        onUpdate({ 
-          ...profile, 
-          photo: selectedImage.uri 
-        });
-      }
+  const asset = result.assets[0];
+  console.log('📸 Photo selected:', asset.uri);
+  console.log('📸 mimeType:', asset.mimeType);
+  console.log('📸 fileSize:', asset.fileSize);
+  onUpdate({ ...profile, photo: asset.uri });
+  setPhoto(asset.uri, asset.mimeType ?? 'image/jpeg', asset.fileSize ?? 0);
+}
     } catch (error) {
-      alert('Failed to pick image. Please try again.');
+     showErrorToast('Failed to pick image. Please try again.');
     }
   };
 
@@ -100,14 +93,15 @@ interface CompleteProfileProps {
 
   const handleVerify = () => {
     if (otp.join('').length === 4) {
+      setPhoneNumber(`${selectedCountry.dialCode}${phoneNumber}`);
       setShowOTP(false);
       onContinue();
     } else {
-     alert('Please enter a valid 4 digit-OTP');
+     showErrorToast('Please enter a valid 4 digit-OTP');
     }
   };
 
-  const isFormValid = phoneNumber.trim() !== '';
+  const isFormValid = userName.trim() !== '';
 
   return (
    <KeyboardAvoidingView
@@ -171,6 +165,7 @@ interface CompleteProfileProps {
                placeholder="7076******"
               value={phoneNumber}
               onChangeText={(value) => {
+                  setPhoneNumberLocal(value);
                   setPhoneNumber(value);
                 if (value && !validatePhoneNumber(value)) {
                   setPhoneError('Please enter a valid phone number');
@@ -201,7 +196,10 @@ interface CompleteProfileProps {
          <CustomInput
            label="Short Bio"
            value={bio}
-           onChangeText={setBio}
+           onChangeText={(text) => {
+             setBioLocal(text);
+             setBio(text);
+           }}
            placeholder="Enter details about your self"
            multiline
            numberOfLines={4}
@@ -217,7 +215,17 @@ interface CompleteProfileProps {
          <View style={styles.buttonContainer}>
         <Button 
           title="Continue" 
-          onPress={() => setShowOTP(true)} 
+          onPress={() => {
+            setUsername(userName);
+            setBio(bio)
+            if (phoneNumber.trim()) {
+              // has phone number - show OTP modal 
+              setShowOTP(true);
+            } else {
+              // no phone number - skip OTP and go next 
+              onContinue();
+            }
+           }} 
           disabled={!isFormValid} 
         />
       </View>

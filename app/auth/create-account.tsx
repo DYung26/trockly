@@ -26,7 +26,6 @@ interface ValidationErrors {
   firstName?: string;
   lastName?: string;
   email?: string;
-  phoneNumber?: string;
   password?: string;
   confirmPassword?: string;
 }
@@ -38,7 +37,6 @@ const SignupScreen: React.FC = () => {
  // const { signup } = useAuth();
   const [firstName, setFirstName] = useState('');
 const [lastName, setLastName] = useState('');
-const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -64,7 +62,6 @@ const [phoneNumber, setPhoneNumber] = useState('');
     firstName.trim() !== '' &&
     lastName.trim() !== '' &&
     email.trim() !== '' &&
-    phoneNumber.trim() !== '' &&
     password.trim() !== '' &&
     confirmPassword.trim() !== '' &&
     agreeToTerms &&
@@ -80,7 +77,7 @@ const [phoneNumber, setPhoneNumber] = useState('');
 
 const handleCreateAccount = () => {
   const result = signupSchema.safeParse({
-    firstName, lastName, email, phoneNumber, password, confirmPassword,
+    firstName, lastName, email,  password, confirmPassword,
   });
 
   if (!result.success) {
@@ -89,7 +86,6 @@ const handleCreateAccount = () => {
       firstName: errors.firstName?.[0],
       lastName: errors.lastName?.[0],
       email: errors.email?.[0],
-      phoneNumber: errors.phoneNumber?.[0],
       password: errors.password?.[0],
       confirmPassword: errors.confirmPassword?.[0],
     });
@@ -141,19 +137,6 @@ const handleCreateAccount = () => {
                 error={validationErrors.lastName} 
                 />
              </View>
-             <View style={styles.inputContainer}>
-              <CustomInput
-                label="Phone Number"
-                placeholder="E.g +234 800 000 0000"
-                value={phoneNumber}
-                onChangeText={(text) => {
-                  setPhoneNumber(text.replace(/\s/g, ''));
-                  setValidationErrors(p => ({...p, phoneNumber: undefined}));
-                }}
-                keyboardType="phone-pad"
-                error={validationErrors.phoneNumber} 
-              />
-            </View>
             {/* Email Input */}
             <View style={styles.inputContainer}>
              <CustomInput

@@ -10,6 +10,8 @@ import {
 import Button from '../reusables/PostButton';
 import { BORDER_RADIUS, SPACING } from '../constants/layout';
 import { colors } from '../constants/theme';
+import { useProfileStore } from '../store/profile.store';
+import { useCreateTrocklerProfile, useSetPreferencesAndSwap } from '../hooks/userProfile';
 import ThemedText from '../reusables/ThemedText';
 
 interface SetSwapDistanceProps {
@@ -25,6 +27,12 @@ const SetSwapDistance: React.FC<SetSwapDistanceProps> = ({
 }) => {
    const sliderWidth = Dimensions.get('window').width - 80;
    const stepWidth = sliderWidth / 4; 
+
+   const { setSwapRadiusKm } = useProfileStore();
+   const { mutateAsync: createProfile, isPending: isCreating } = useCreateTrocklerProfile();
+   const { mutateAsync: setPrefAndSwap, isPending: isSaving } = useSetPreferencesAndSwap();
+
+   const isPending = isCreating || isSaving;
    
    const thumbX = useRef(new Animated.Value((swapDistance - 1) * stepWidth)).current;
    const startX = useRef(0);
@@ -118,7 +126,18 @@ const SetSwapDistance: React.FC<SetSwapDistanceProps> = ({
 
     <View style={styles.fullWidthButtonWrapper}>
       <View style={styles.buttonContainer}>
-        <Button title="Continue" onPress={onContinue} />
+        <Button 
+          title={isPending ? 'Setting up...' : 'Finish'}
+          disabled={isPending} 
+          onPress={async () => {
+             setSwapRadiusKm(swapDistance);
+             try {
+              await createProfile();
+              await setPrefAndSwap();
+             } catch {}
+          }} 
+          
+          />
       </View>
     </View>
   </View>

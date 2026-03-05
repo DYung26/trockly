@@ -12,8 +12,8 @@ export const LOCATIONS: Location[] = [
 
 
 export const PREFERENCES: Preference[] = [
-  { id: '1', name: 'Bike repair', selected: false },
-  { id: '2', name: 'Books', selected: false },
+  { id: '1', name: 'books', selected: false },
+  { id: '2', name: 'electronics', selected: false },
   { id: '3', name: 'Tools', selected: false },
   { id: '4', name: 'Clothes', selected: false },
   { id: '5', name: 'PC repair', selected: false },

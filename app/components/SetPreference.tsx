@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import Button from '../reusables/PostButton';
 import { Preference } from '../types';
+import { useProfileStore } from '../store/profile.store';
 import { colors } from '../constants/theme';
 import ThemedText from '../reusables/ThemedText';
 import { SPACING } from '../constants/layout';
@@ -14,6 +15,7 @@ interface SetPreferencesProps {
 
 const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, onContinue }) => {
   const selectedCount = preferences.filter((p) => p.selected).length;
+  const { setPreferences } = useProfileStore();
 
   return (
     <View style={styles.screenContainer}>
@@ -29,7 +31,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubble, preferences[0].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[0].selected && selectedCount >= 3) return;
+                if (!preferences[0].selected && selectedCount >= 2) return;
                 onToggle(preferences[0].id);
               }}
               activeOpacity={0.7}
@@ -42,7 +44,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubbleCircle, styles.bubbleMiddle, preferences[1].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[1].selected && selectedCount >= 3) return;
+                if (!preferences[1].selected && selectedCount >= 2) return;
                 onToggle(preferences[1].id);
               }}
               activeOpacity={0.7}
@@ -55,7 +57,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubble, preferences[2].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[2].selected && selectedCount >= 3) return;
+                if (!preferences[2].selected && selectedCount >= 2) return;
                 onToggle(preferences[2].id);
               }}
               activeOpacity={0.7}
@@ -71,7 +73,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubble, preferences[3].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[3].selected && selectedCount >= 3) return;
+                if (!preferences[3].selected && selectedCount >= 2) return;
                 onToggle(preferences[3].id);
               }}
               activeOpacity={0.7}
@@ -84,7 +86,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubbleCircle, styles.bubbleMiddle, preferences[4].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[4].selected && selectedCount >= 3) return;
+                if (!preferences[4].selected && selectedCount >= 2) return;
                 onToggle(preferences[4].id);
               }}
               activeOpacity={0.7}
@@ -97,7 +99,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubble, preferences[5].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[5].selected && selectedCount >= 3) return;
+                if (!preferences[5].selected && selectedCount >= 2) return;
                 onToggle(preferences[5].id);
               }}
               activeOpacity={0.7}
@@ -113,7 +115,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubble, preferences[6].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[6].selected && selectedCount >= 3) return;
+                if (!preferences[6].selected && selectedCount >= 2) return;
                 onToggle(preferences[6].id);
               }}
               activeOpacity={0.7}
@@ -126,7 +128,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubbleCircle, styles.bubbleMiddle, preferences[7].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[7].selected && selectedCount >= 3) return;
+                if (!preferences[7].selected && selectedCount >= 2) return;
                 onToggle(preferences[7].id);
               }}
               activeOpacity={0.7}
@@ -139,7 +141,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubble, preferences[8].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[8].selected && selectedCount >= 3) return;
+                if (!preferences[8].selected && selectedCount >= 2) return;
                 onToggle(preferences[8].id);
               }}
               activeOpacity={0.7}
@@ -155,7 +157,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubble, preferences[9].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[9].selected && selectedCount >= 3) return;
+                if (!preferences[9].selected && selectedCount >= 2) return;
                 onToggle(preferences[9].id);
               }}
               activeOpacity={0.7}
@@ -168,7 +170,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubbleCircle, styles.bubbleMiddle, preferences[10].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[10].selected && selectedCount >= 3) return;
+                if (!preferences[10].selected && selectedCount >= 2) return;
                 onToggle(preferences[10].id);
               }}
               activeOpacity={0.7}
@@ -181,7 +183,7 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
             <TouchableOpacity
               style={[styles.bubble, preferences[11].selected && styles.bubbleSelected]}
               onPress={() => {
-                if (!preferences[11].selected && selectedCount >= 3) return;
+                if (!preferences[11].selected && selectedCount >= 2) return;
                 onToggle(preferences[11].id);
               }}
               activeOpacity={0.7}
@@ -198,8 +200,14 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
          <View style={styles.buttonContainer}>
         <Button 
           title="Continue"
-          onPress={onContinue} 
-          disabled={selectedCount < 3} 
+          onPress={() => {
+            const selected = preferences
+             .filter((p) => p.selected)
+             .map((p) => p.name.toLowerCase());
+             setPreferences(selected);
+             onContinue();
+          }} 
+          disabled={selectedCount < 2} 
           />
       </View>
       </View>

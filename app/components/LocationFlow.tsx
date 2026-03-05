@@ -9,10 +9,12 @@ import {
   StyleSheet 
 } from 'react-native';
 import Button from '../reusables/PostButton';
-import { LOCATIONS } from '../constants/data';
+//import { LOCATIONS } from '../constants/data';
 import * as Location from 'expo-location';
 import { SPACING, BORDER_RADIUS } from '../constants/layout';
 import { colors } from '../constants/theme';
+import { CustomInput } from '../reusables/CustomInput';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import ThemedText from '../reusables/ThemedText';
 import { FONT_SIZES } from '../constants/typography';
 
@@ -28,7 +30,7 @@ const LocationFlow: React.FC<LocationFlowProps> = ({
   onContinue,
 }) => {
   const [view, setView] = useState<'initial' | 'manual'>('initial');
-  const [showDropdown, setShowDropdown] = useState(false);
+  //const [showDropdown, setShowDropdown] = useState(false);
 
   const handleLocationAccess = async () => {
   try {
@@ -68,34 +70,6 @@ const LocationFlow: React.FC<LocationFlowProps> = ({
   }
 };
 
-  if (view === 'initial') {
-    return (
-      <View style={styles.screenContainerCenter}>
-        <ScrollView contentContainerStyle={styles.scrollContentCenter} showsVerticalScrollIndicator={false}>
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircleLarge}>
-                <Image 
-                   source={require('../../assets/images/find-location.png')}
-                />
-            </View>
-          </View>
-
-          <ThemedText variant='title'>Find Trades Near You</ThemedText>
-          <ThemedText variant='subtitle'>
-            Tradsly allows you offers in your area. Your exact location is never shared publicly.
-          </ThemedText>
-        </ScrollView>
-
-        <View style={styles.buttonAccess}>
-          <Button title="Allow location access" onPress={handleLocationAccess}  />
-          <TouchableOpacity style={styles.textButton} onPress={() => setView('manual')}>
-            <ThemedText variant='subtitle'>Enter neighborhood manually</ThemedText>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
   // Manual view: Choose Your Neighbourhood
   return (
     <View style={styles.screenContainer}>
@@ -111,37 +85,15 @@ const LocationFlow: React.FC<LocationFlowProps> = ({
         showsVerticalScrollIndicator={false}>
         <ThemedText variant='subtitleSmall'>Select your neighbourhood to find nearby trades</ThemedText>
 
-        <ThemedText variant='h3'>Select your neighbourhood</ThemedText>
+        <ThemedText variant='h3'>Enter  your neighbourhood</ThemedText>
 
-        <TouchableOpacity
-          style={styles.dropdown}
-          onPress={() => setShowDropdown(!showDropdown)}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.dropdownText, !selectedLocation && styles.dropdownPlaceholder]}>
-            {selectedLocation || 'Select'}
-          </Text>
-          <Text style={styles.dropdownArrow}>▼</Text>
-        </TouchableOpacity>
-
-        {showDropdown && (
-          <View style={styles.dropdownMenu}>
-            {LOCATIONS.map((location) => (
-              <TouchableOpacity
-                key={location.id}
-                style={styles.dropdownItem}
-                onPress={() => {
-                  onSelect(location.name);
-                  setShowDropdown(false);
-                }}
-                activeOpacity={0.7}
-              >
-              <Image source={require('../../assets/images/location-pin.png')} />
-                <ThemedText variant='dropdownItemText'>{location.name}</ThemedText>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+      <CustomInput
+        label="Address"
+        placeholder='Enter your address e.g 123 Main St, Lagos'
+        value={selectedLocation}
+        onChangeText={onSelect}
+        autoCapitalize='words'
+      />
       </ScrollView>
 
      <View style={styles.fullWidthButtonWrapper}>

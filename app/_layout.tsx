@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { 
   useFonts, 
@@ -11,13 +11,39 @@ import { ThemeProvider } from "./providers/ThemeProviders";
 import { ActivityIndicator, View } from "react-native";
 import { useAuthStore } from "./store/auth.store";
 import Toast from "react-native-toast-message";
+import { checkOnboardingStatus } from "./hooks/userProfile";
 import { QueryProvider } from "./providers/queryProvider";
 
+
+
+
+// CHANGE AuthInitializer to this
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   const loadAuthData = useAuthStore((s) => s.loadAuthData);
-  useEffect(() => { loadAuthData(); }, []);
+  const clearAuthData = useAuthStore((s) => s.clearAuthData)
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isLoading = useAuthStore((s) => s.isLoading);
+  const router = useRouter();
+
+  useEffect(() => { 
+    useAuthStore.setState({ isLoading: false });
+  // clearAuthData();
+   // loadAuthData(); 
+  }, []);
+  
+ 
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#3247D5' }}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
+
   return <>{children}</>;
 }
+
 
 const RootLayout = () => {
   const [fontsLoaded] = useFonts({
@@ -46,6 +72,7 @@ const RootLayout = () => {
         <Stack.Screen name="auth/OTPVerification" options={{ headerShown: false }} />
         <Stack.Screen name="auth/forgot-password" options={{ headerShown: false }} />
         <Stack.Screen name="auth/reset-password" options={{ headerShown: false }} />
+        <Stack.Screen name="offer/create-offer" options={{ headerShown: false }} />
         <Stack.Screen name="auth/forgotPasswordVerificationScreen" options={{ headerShown: false }} />
         <Stack.Screen name="auth/success" options={{ headerShown: false }} />
         <Stack.Screen name="auth/reset-success" options={{ headerShown: false }} />

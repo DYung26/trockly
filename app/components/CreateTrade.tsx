@@ -28,10 +28,14 @@ export const CATEGORIES: OfferCategory[] = ['object', 'service', 'food'];
 
 interface CreateTradeProps {
   onPreview: () => void;
+  onSkip: () => void;
+  fromApp?: boolean;
 }
 
  const CreateTrade: React.FC<CreateTradeProps> = ({ 
  onPreview,
+ onSkip,
+ fromApp
 }) => {
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [dayOpen, setDayOpen] = useState(false);
@@ -87,21 +91,48 @@ const handlePhotoAdd = async () => {
 
  const handleRemovePhoto = (uri: string) => removePhoto(uri);
 
-  const isFormValid = form.category && form.title && form.photos.length > 0 && form.availability.day;
+  const isFormValid = form.category && form.title && form.photos.length > 0 && form.availability.day && form.location.trim() !== ''; 
 
   return (
-    <KeyboardAvoidingView 
+   <View style={{ flex: 1, }}>
+     <KeyboardAvoidingView 
        style={{ flex: 1 }}
-       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-       keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+       //keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
     >
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}> 
      <View style={styles.screenContainer}>
       <ScrollView 
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
+        <View 
+          style={{
+           flexDirection: 'row', 
+          justifyContent: fromApp ? 'flex-start' : 'flex-end', 
+           marginBottom: 8 
+          }}>
+          <TouchableOpacity
+            onPress={onSkip}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+          >
+          {fromApp ? (
+            <Image source={require('../../assets/images/go-back.png')} style={{ width: 17.5, height: 13.5 }} />
+          ): null}
+          <Text
+            style={{
+              color: "#4F535A", 
+              fontSize: 14, 
+              fontWeight: '600', 
+              fontFamily: 'WorkSans_600Semibold'}}>
+               {fromApp ? 'Go Back' : 'Skip'}
+              </Text>
+              {!fromApp ? (
+                <Ionicons name="arrow-forward" size={20} color="#4F535A" />
+              ): null}
+          </TouchableOpacity>
+        </View>
         <ThemedText variant='preferenceTitle'>Create an Item</ThemedText>
         
         <View style={{ marginTop: 10 }}>
@@ -117,7 +148,10 @@ const handlePhotoAdd = async () => {
               activeOpacity={0.8}
             >
              <Text style={styles.dropdownText}>
-                {form.category || 'Select Category'}
+                {form.category
+                  ? form.category.charAt(0).toUpperCase() + form.category.slice(1)
+                  : 'Select Category'
+                }
              </Text>
              <Ionicons
                name={categoryOpen ? 'chevron-up' : 'chevron-down'}
@@ -136,7 +170,9 @@ const handlePhotoAdd = async () => {
                      setCategoryOpen(false);
                    }}
                  >
-                  <Text style={styles.dropdownItemText}>{cat}</Text>
+                  <Text style={styles.dropdownItemText}>
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </Text>
                  </TouchableOpacity>
                 ))}
               </View>
@@ -227,6 +263,67 @@ const handlePhotoAdd = async () => {
            onChangeText={(text) => updateWant(want.id, { description: text })}
            placeholder="Any specific details..."
           />
+
+          {/* Quantity Stepper */}
+          <View 
+            style={{
+              flexDirection: 'row', 
+              alignItems: 'center', 
+              marginBottom: 12, 
+              gap: 12 
+            }}>
+           <Text style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+           }}>
+            Quantity
+           </Text>
+           <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+           }}>
+             <TouchableOpacity
+               onPress={() => updateWant(want.id, { quantity: Math.max(1, (want.quantity || 1) -1) })}
+               style={{
+                 width: 32,
+                 height: 32,
+                 borderRadius: 16,
+                 borderWidth: 1,
+                 borderColor: colors.borderColor, 
+                 alignItems: 'center',
+                 justifyContent: 'center'
+               }}
+             >
+             <Text style={{ fontSize: 18, color: colors.textPrimary }}>−</Text>
+             </TouchableOpacity>
+             <Text
+              style={{
+               fontSize: 16,
+               fontWeight: '600',
+               minWidth: 24,
+               textAlign: 'center'
+              }}
+             >
+              {want.quantity || 1}
+             </Text>
+             <TouchableOpacity
+               onPress={() => updateWant(want.id, { quantity: (want.quantity || 1) + 1})}
+               style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                borderWidth: 1, 
+                borderColor: colors.borderColor,
+                alignItems: 'center',
+                justifyContent: 'center'
+               }}
+             >
+              <Text style={{ fontSize: 18, color: colors.textPrimary }}>+</Text>
+             </TouchableOpacity>
+           </View>
+          </View>
 
         {form.wants.length > 1 && (
          <TouchableOpacity onPress={() => removeWant(want.id)}>
@@ -352,20 +449,18 @@ const handlePhotoAdd = async () => {
           <ThemedText variant='current'>Use my current location</ThemedText>
         </TouchableOpacity>
       </ScrollView>
-
-      <View style={styles.fullWidthButtonWrapper}>
+    </View>
+    </KeyboardAvoidingView>
+    <View style={styles.fullWidthButtonWrapper}>
          <View style={styles.buttonContainer}>
            <Button 
              title={isPending ? 'Posting...' : 'Post Trade'}
              onPress={onPreview}
             disabled={!isFormValid}
            />
-          {/* <Button title={isPending ? 'Posting...' : 'Post Trade'} onPress={() => submitOffer()} disabled={!isFormValid || isPending} /> */}
       </View>
       </View>
-    </View>
-    </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+   </View>
   );
 };
 
@@ -377,7 +472,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: SPACING.xl,
-    paddingBottom: 120,
+    paddingBottom: 250,
   },
   availabilityWrapper: {
    flexDirection: 'row',
