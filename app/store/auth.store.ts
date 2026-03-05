@@ -28,11 +28,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user, accessToken: token, isAuthenticated: true });
   },
 
-  clearAuthData: async () => {
-    await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
-    await AsyncStorage.removeItem(USER_DATA_KEY);
-    set({ user: null, accessToken: null, isAuthenticated: false });
-  },
+ clearAuthData: async () => {
+  await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
+  await AsyncStorage.removeItem(USER_DATA_KEY);
+  set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false }); 
+},
 
   loadAuthData: async () => {
     try {

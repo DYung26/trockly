@@ -16,6 +16,7 @@ import {
 } from "../types/auth.types";
 import { useAuthStore } from "../store/auth.store";
 import { showSuccessToast, showErrorToast } from "../utils/toast";
+import { checkOnboardingStatus } from "./userProfile";
 
 export function useSignup() {
   const router = useRouter();
@@ -53,8 +54,17 @@ export function useLogin() {
     onSuccess: async (response) => {
       const { accessToken, ...user } = response.data;
       await setAuthData(user as User, accessToken);
+
       showSuccessToast('Login Successful!');
-      router.replace('/post-account/onboarding');
+
+      // Check if user has completed onboarding 
+      const isOnboarded = await checkOnboardingStatus();
+      
+      if (isOnboarded) {
+        router.replace('/Dashboard/dashboard');
+      } else {
+         router.replace('/post-account/onboarding');
+      }
     },
     onError: (error: Error) => {
       showErrorToast(error.message || 'Invalid email or password.');
@@ -65,6 +75,7 @@ export function useLogin() {
 
 export function useVerifyEmail() {
   const router = useRouter();
+  const { setAuthData } = useAuthStore();
 
   return useMutation({
     mutationFn: async (data: { email: string; otp: string }) => {
@@ -74,7 +85,11 @@ export function useVerifyEmail() {
       );
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
+      if (response.data?.accessToken) {
+        const { accessToken, ...user } = response.data;
+        setAuthData(user as User, accessToken);
+      }
       showSuccessToast('Email verified successfully!');
       setTimeout(() => router.push('/auth/success'), 1500);
     },
@@ -108,7 +123,6 @@ export function useForgotPassword() {
     },
   });
 }
-
 
 
 export function useVerifyOtp() {

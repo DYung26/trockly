@@ -11,6 +11,7 @@ export const colors = {
   priBlue: '#39417C',
    primary: '#4461F2',
   textDisabled: '#777A84',
+  itemBg: '#24294F',
   greyWhite: '#EFEEF0',
   borderColor: '#BBBDC0',
   shadeWhite: '#E2E8F0',

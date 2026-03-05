@@ -1,3 +1,5 @@
+
+
 export const API_ENDPOINTS = {
   auth: {
     signup: "/auth/signup",
@@ -18,11 +20,13 @@ export const API_ENDPOINTS = {
     getAll: "/files",
     getById: (id: string) => `/files/${id}`,
   },
+  trocklerProfile: {
+    create: "/trockler-profile",
+    setPreferences: "/trockler-profile/preferences",
+    me: "/trockler-profile/me"
+  },
   offers: {
     create: "/offer",
     getAll: "/offer"
-  },
-  trocklerProfile: {
-    create: "/trockler-profile"
   },
 } as const;

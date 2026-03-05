@@ -13,14 +13,14 @@ import LocationFlow from '../components/LocationFlow';
 import CompleteProfile from '../components/CompleteProfile';
 import SetPreferences from '../components/SetPreference';
 import SetSwapDistance from '../components/SetSwapDistance';
-import CreateTrade from '../components/CreateTrade';
-import TradePreview from '../components/TradePreview';
 import SuccessScreen from '../components/SuccessScreen';
+import { useProfileStore } from '../store/profile.store';
 
 const Onboarding: React.FC = () => {
   const swiperRef = useRef<Swiper>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { setAddress } = useProfileStore();
 
   // State management
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -31,13 +31,15 @@ const Onboarding: React.FC = () => {
   });
   const [preferences, setPreferences] = useState<Preference[]>(PREFERENCES);
   const [swapDistance, setSwapDistance] = useState(4);
-  const [showPreview, setShowPreview] = useState(false);
 
   // Handlers
   const handleNext = () => {
-  if (swiperRef.current && currentStep < 4) { 
+    if (swiperRef.current && currentStep < 3) { 
     swiperRef.current.scrollBy(1);
   }
+  // if (swiperRef.current && currentStep < 4) { 
+  //   swiperRef.current.scrollBy(1);
+  // }
 };
 
   const handlePreferenceToggle = (id: string) => {
@@ -49,77 +51,60 @@ const Onboarding: React.FC = () => {
     }
   };
 
-  const handlePublish = () => {
-    setShowSuccess(true);
-  };
 
   const handleFinish = () => {
     // Navigate to home screen or reset flow
   };
 
-  // Show success screen
-  if (showSuccess) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" />
-        <SuccessScreen onFinish={handleFinish} />
-      </SafeAreaView>
-    );
-  }
 
-  // Main onboarding flow
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-     
-      {!showPreview && (
-       <View style={styles.progressWrapper}>
-        <ProgressBar currentStep={currentStep} totalSteps={5} />
-      </View>
-      )}
-     
 
-     {showPreview ? (
-       <TradePreview
-           onBack={() => setShowPreview(false)}
+ return (
+  <SafeAreaView style={styles.container}>
+    <StatusBar barStyle="dark-content" />
+
+    {showSuccess ? (
+      <SuccessScreen onFinish={handleFinish} />
+    ) : (
+      <>
+        <View style={styles.progressWrapper}>
+          <ProgressBar currentStep={currentStep} totalSteps={4} />
+        </View>
+
+        <Swiper
+          ref={swiperRef}
+          loop={false}
+          showsPagination={false}
+          scrollEnabled={false}
+          onIndexChanged={(index) => setCurrentStep(index)}
+        >
+          <LocationFlow
+            selectedLocation={selectedLocation}
+            onSelect={(val) => {
+              setSelectedLocation(val);
+              setAddress(val);
+            }}
+            onContinue={handleNext}
           />
-     ): (
-     <Swiper
-        ref={swiperRef}
-        loop={false}
-        showsPagination={false}
-        scrollEnabled={false}
-        onIndexChanged={(index) => setCurrentStep(index)}
-      >
-        {/* Screen 1: Location Selection */}
-        <LocationFlow
-          selectedLocation={selectedLocation}
-          onSelect={setSelectedLocation}
-          onContinue={handleNext}
-        />
-
-        <CompleteProfile 
-          profile={profile} 
-          onUpdate={setProfile} 
-          onContinue={handleNext}
-         />
-
-        <SetPreferences 
-          preferences={preferences} 
-          onToggle={handlePreferenceToggle} 
-          onContinue={handleNext} 
+          <CompleteProfile
+            profile={profile}
+            onUpdate={setProfile}
+            onContinue={handleNext}
           />
-
-        <SetSwapDistance
-          swapDistance={swapDistance}
-          onDistanceChange={setSwapDistance}
-          onContinue={handleNext}
-        />
-        <CreateTrade onPreview={() => setShowPreview(true)} />
-      </Swiper>
-     )}
-    </SafeAreaView>
-  );
+          <SetPreferences
+            preferences={preferences}
+            onToggle={handlePreferenceToggle}
+            onContinue={handleNext}
+          />
+          <SetSwapDistance
+            swapDistance={swapDistance}
+            onDistanceChange={setSwapDistance}
+            onContinue={handleNext}
+          />
+        </Swiper>
+      </>
+    )}
+  </SafeAreaView>
+);
 };
 
 const styles = StyleSheet.create({

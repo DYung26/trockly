@@ -30,27 +30,47 @@ export interface Review {
 }
 
 export interface CreateTrocklerProfileRequest {
-    username: string;
-    phoneNumber: string;
+   username: string;
+   address: string;
+   bio?: string;
+   avatarMediaId?: string;
+   phoneNumber?: string;
+}
+
+export interface SetPreferencesRequest {
     preferences: string[];
     swapRadiusKm: number;
-    address: string;
-    profilePhotoId?: string; // fieldId from upload 
+}
+
+export interface SetPreferencesResponse {
+    statusCode: number;
+    message: string;
+    data: TrocklerProfile;
 }
 
 export interface TrocklerProfile {
-    id: string;
-    username: string;
-    phoneNumber: string;
-    preferences: string[];
-    swapRadiusKm: number;
-    address: string;
-    profilePhoto?: string;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  userId: string;
+  username: string;
+  phoneNumber?: string;
+  preferences: string[];
+  swapRadiusKm: number;
+  bio?: string;
+  address: string;
+  avatarMediaId?: string;
+  isOnboardingComplete: boolean;
+  createdAt: string;
+  updatedAt: string;
+  avatarUrl?: string;
 }
 
 export interface CreateTrocklerProfileResponse {
+    statusCode: number;
+    message: string;
+    data: TrocklerProfile;
+}
+
+export interface GetMyProfileResponse {
     statusCode: number;
     message: string;
     data: TrocklerProfile;

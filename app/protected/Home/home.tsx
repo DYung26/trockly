@@ -341,7 +341,14 @@ const onSwipeComplete = (direction: 'left' | 'right') => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Image source={{ uri: userProfile.photo }} style={styles.profilePhoto} />
+          {userProfile.photo ? (
+            <Image source={{ uri: userProfile.photo }} style={styles.profilePhoto} />
+          ): (
+            <Image 
+               source={require('../../../assets/images/default-avatar.png')}
+               style={styles.profilePhoto}
+            />
+          )}
           <View>
             <ThemedText variant="welcomeText">
               <ThemedText variant="welcomeWord">Welcome</ThemedText>
