@@ -73,13 +73,13 @@ interface CompleteProfileProps {
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-  const asset = result.assets[0];
-  console.log('📸 Photo selected:', asset.uri);
-  console.log('📸 mimeType:', asset.mimeType);
-  console.log('📸 fileSize:', asset.fileSize);
-  onUpdate({ ...profile, photo: asset.uri });
-  setPhoto(asset.uri, asset.mimeType ?? 'image/jpeg', asset.fileSize ?? 0);
-}
+        const asset = result.assets[0];
+        console.log('📸 Photo selected:', asset.uri);
+        console.log('📸 mimeType:', asset.mimeType);
+        console.log('📸 fileSize:', asset.fileSize);
+        onUpdate({ ...profile, photo: asset.uri });
+        setPhoto(asset.uri, asset.mimeType ?? 'image/jpeg', asset.fileSize ?? 0);
+      }
     } catch (error) {
      showErrorToast('Failed to pick image. Please try again.');
     }
@@ -238,6 +238,7 @@ interface CompleteProfileProps {
         onOtpChange={handleOtpChange}
         onVerify={handleVerify}
         onClose={() => setShowOTP(false)}
+        phoneNumber={`${selectedCountry.dialCode}${phoneNumber}`}
       />
     </View>
      </TouchableWithoutFeedback>
