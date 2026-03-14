@@ -71,13 +71,16 @@ async function uploadProfilePhoto(
 export function useCreateTrocklerProfile() {
   return useMutation({
     mutationFn: async () => {
-        const { form } = useProfileStore.getState();
-       console.log('🚀 createProfile fired');
-  console.log('🚀 form.photoUri:', form.photoUri);
-  console.log('🚀 form.photoMimeType:', form.photoMimeType);
-  console.log('🚀 form.photoSize:', form.photoSize);
-  console.log('🚀 form.username:', form.username);
-  console.log('🚀 form.address:', form.address);
+      const { form } = useProfileStore.getState();
+      console.log('🚀 createProfile fired');
+      console.log('🚀 form.photoUri:', form.photoUri);
+      console.log('🚀 form.photoMimeType:', form.photoMimeType);
+      console.log('🚀 form.photoSize:', form.photoSize);
+      console.log('🚀 form.username:', form.username);
+      console.log('🚀 form.address:', form.address);
+      console.log('🚀 form.bio:', form.bio);
+      console.log('🚀 form.phoneNumber:', form.phoneNumber);
+
       let avatarMediaId: string | undefined;
 
       if (form.photoUri && form.photoMimeType && form.photoSize) {

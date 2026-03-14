@@ -22,6 +22,7 @@ interface OTPModalProps {
   onOtpChange: (value: string, index: number) => void;
   onVerify: () => void;
   onClose: () => void;
+  phoneNumber?: string;
 }
 
 export const OTPModal: React.FC<OTPModalProps> = ({
@@ -30,6 +31,7 @@ export const OTPModal: React.FC<OTPModalProps> = ({
   onOtpChange,
   onVerify,
   onClose,
+  phoneNumber = '',
 }) => {
   const otpInputs = useRef<TextInput[]>([]);
 
@@ -59,7 +61,7 @@ export const OTPModal: React.FC<OTPModalProps> = ({
             </View>
             
             <Text style={styles.modalSubtitle}>
-              Enter the 4-digit code we sent to 07078787399{'\n'}                    to verify your phone number
+              Enter the 4-digit code we sent to {phoneNumber}{'\n'} to verify your phone number
             </Text>
 
             {/* OTP Input Boxes */}
