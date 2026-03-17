@@ -4,8 +4,10 @@ import {
   Text, 
   StyleSheet,
   Animated,
+  Image,
   PanResponder,
-  Dimensions
+  Dimensions,
+  TouchableOpacity
 } from 'react-native';
 import Button from '../reusables/PostButton';
 import { BORDER_RADIUS, SPACING } from '../constants/layout';
@@ -18,12 +20,14 @@ interface SetSwapDistanceProps {
   swapDistance: number;
   onDistanceChange: (distance: number) => void;
   onContinue: () => void;
+  onBack?: () => void; 
 }
 
 const SetSwapDistance: React.FC<SetSwapDistanceProps> = ({
   swapDistance,
   onDistanceChange,
   onContinue,
+  onBack
 }) => {
    const sliderWidth = Dimensions.get('window').width - 80;
    const stepWidth = sliderWidth / 4; 
@@ -76,6 +80,7 @@ const SetSwapDistance: React.FC<SetSwapDistanceProps> = ({
        toValue: (swapDistance - 1) * stepWidth,
        useNativeDriver: false,
      }).start();
+     // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [swapDistance]);
 
    const fillWidth = thumbX.interpolate({
@@ -86,6 +91,18 @@ const SetSwapDistance: React.FC<SetSwapDistanceProps> = ({
 
   return (
    <View style={styles.screenContainer}>
+    <TouchableOpacity
+      onPress={onBack}
+      style={styles.backRow}
+    >
+     <Image 
+       source={require('../../assets/images/go-back.png')}
+       style={styles.backImg}
+       />
+       <Text style={{ fontSize: 14, fontWeight: '600', color: '#4F535A', fontFamily: 'Poppins_500Medium' }}>
+         Go Back
+       </Text>
+    </TouchableOpacity>
     <View style={styles.headerSection}>
       <ThemedText variant='preferenceTitle'>Set Your Swap Distance</ThemedText>
       <ThemedText variant='subtitle'>Choose how far you want to discover offers</ThemedText>
@@ -149,6 +166,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: SPACING.xl,
     backgroundColor: colors.surfacePage,
+  },
+  backRow: {
+     flexDirection: 'row',
+     alignItems: 'center',
+     gap: 6,
+     paddingTop: SPACING.xl,
+     paddingBottom: 4,
+  },
+  backImg: {
+    width: 17.5,
+    height: 13.5,
   },
   headerSection: {
    paddingTop: SPACING.xl,

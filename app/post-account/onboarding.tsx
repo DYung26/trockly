@@ -37,9 +37,12 @@ const Onboarding: React.FC = () => {
     if (swiperRef.current && currentStep < 3) { 
     swiperRef.current.scrollBy(1);
   }
-  // if (swiperRef.current && currentStep < 4) { 
-  //   swiperRef.current.scrollBy(1);
-  // }
+};
+
+const handleBack = () => {
+  if (swiperRef.current && currentStep > 0) {
+     swiperRef.current.scrollBy(-1);
+  }
 };
 
   const handlePreferenceToggle = (id: string) => {
@@ -89,16 +92,19 @@ const Onboarding: React.FC = () => {
             profile={profile}
             onUpdate={setProfile}
             onContinue={handleNext}
+            onBack={handleBack}
           />
           <SetPreferences
             preferences={preferences}
             onToggle={handlePreferenceToggle}
             onContinue={handleNext}
+            onBack={handleBack}
           />
           <SetSwapDistance
             swapDistance={swapDistance}
             onDistanceChange={setSwapDistance}
             onContinue={handleNext}
+            onBack={handleBack}
           />
         </Swiper>
       </>

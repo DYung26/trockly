@@ -12,18 +12,16 @@ export const LOCATIONS: Location[] = [
 
 
 export const PREFERENCES: Preference[] = [
-  { id: '1', name: 'books', selected: false },
-  { id: '2', name: 'electronics', selected: false },
-  { id: '3', name: 'Tools', selected: false },
-  { id: '4', name: 'Clothes', selected: false },
-  { id: '5', name: 'PC repair', selected: false },
-  { id: '6', name: 'Babysitting', selected: false },
-  { id: '7', name: 'Tutoring', selected: false },
-  { id: '8', name: 'Cleaning', selected: false },
-  { id: '9', name: 'Surplus', selected: false },
-  { id: '10', name: 'Homemade dishes', selected: false },
-  { id: '11', name: 'Dry goods', selected: false },
-  { id: '12', name: 'Small appliances', selected: false },
+  { id: '1', name: 'Books & Media', selected: false },
+  { id: '2', name: 'Electronics & Gadgets', selected: false },
+  { id: '3', name: 'Clothing & Fashion', selected: false },
+  { id: '4', name: 'Tools & DIY', selected: false },
+  { id: '5', name: 'Home & Kitchen', selected: false },
+  { id: '6', name: 'Food & Groceries', selected: false },
+  { id: '7', name: 'Repairs & Tech Help', selected: false },
+  { id: '8', name: 'Tutoring & Learning', selected: false },
+  { id: '10', name: 'Childcare & Household Help', selected: false },
+  { id: '11', name: 'Local Services', selected: false },
 ];
 
 export const CATEGORIES = [

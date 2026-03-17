@@ -31,12 +31,14 @@ interface CompleteProfileProps {
   profile: Profile;
   onUpdate: (profile: Profile) => void;
   onContinue: () => void;
+  onBack?: () => void;
 }
 
  const CompleteProfile: React.FC<CompleteProfileProps> = ({ 
   profile, 
   onUpdate, 
-  onContinue 
+  onContinue,
+  onBack
 }) => {
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '']);
@@ -74,9 +76,9 @@ interface CompleteProfileProps {
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
-        console.log('📸 Photo selected:', asset.uri);
-        console.log('📸 mimeType:', asset.mimeType);
-        console.log('📸 fileSize:', asset.fileSize);
+        // console.log('📸 Photo selected:', asset.uri);
+        // console.log('📸 mimeType:', asset.mimeType);
+        // console.log('📸 fileSize:', asset.fileSize);
         onUpdate({ ...profile, photo: asset.uri });
         setPhoto(asset.uri, asset.mimeType ?? 'image/jpeg', asset.fileSize ?? 0);
       }
@@ -113,6 +115,18 @@ interface CompleteProfileProps {
       <ScrollView 
        contentContainerStyle={styles.scrollContent} 
        showsVerticalScrollIndicator={false}>
+        <TouchableOpacity
+          onPress={onBack}
+          style={styles.backRow}
+        >
+         <Image 
+           source={require('../../assets/images/go-back.png')}
+           style={styles.backImg}
+          />
+         <Text style={{ fontSize: 14, fontWeight: '600', color: '#4F535A', fontFamily: 'Poppins_500Medium' }}>
+            Go Back
+          </Text>
+        </TouchableOpacity>
         <ThemedText variant='profileTitle'>Complete Your Trockler Profile</ThemedText>
 
         {/* Profile Photo Section */}
@@ -255,6 +269,16 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: SPACING.xl,
+  },
+  backRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 16
+  },
+  backImg: {
+    width: 17.5,
+   height: 13.5,
   },
   profilePhotoContainer: {
     alignItems: 'center',

@@ -16,7 +16,6 @@ import {
   UploadUrlResponse, 
   CreateFileRecordRequest, 
   CreateFileRecordResponse,
-  FileRecord,
 } from "../types/offer.types";
 
 
@@ -116,7 +115,7 @@ export function useSetPreferencesAndSwap() {
 
   return useMutation({
      mutationFn: async () => {
-        const { form, resetForm } = useProfileStore.getState();
+        const { form  } = useProfileStore.getState();
        const payload: SetPreferencesRequest = {
          preferences: form.preferences,
          swapRadiusKm: form.swapRadiusKm,

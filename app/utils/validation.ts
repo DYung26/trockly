@@ -62,11 +62,11 @@ export const validateSignupForm = (
   }
 
   // Phone Number validation
-  if (!phoneNumber.trim()) {
-    errors.phoneNumber = 'Phone number is required';
-  } else if (!validatePhoneNumber(phoneNumber)) {
-    errors.phoneNumber = 'Please enter a valid Nigerian phone number (+234XXXXXXXXXX)';
-  }
+  // if (!phoneNumber.trim()) {
+  //   errors.phoneNumber = 'Phone number is required';
+  // } else if (!validatePhoneNumber(phoneNumber)) {
+  //   errors.phoneNumber = 'Please enter a valid Nigerian phone number (+234XXXXXXXXXX)';
+  // }
 
   // Password validation
   if (!password) {
