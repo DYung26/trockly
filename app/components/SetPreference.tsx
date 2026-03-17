@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import Button from '../reusables/PostButton';
 import { Preference } from '../types';
 import { useProfileStore } from '../store/profile.store';
@@ -11,190 +11,64 @@ interface SetPreferencesProps {
   preferences: Preference[];
   onToggle: (id: string) => void;
   onContinue: () => void;
+  onBack?: () => void; 
 }
 
-const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, onContinue }) => {
+const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, onContinue, onBack }) => {
   const selectedCount = preferences.filter((p) => p.selected).length;
   const { setPreferences } = useProfileStore();
 
   return (
     <View style={styles.screenContainer}>
+      <TouchableOpacity
+        onPress={onBack}
+        style={styles.backRow}
+       >
+       <Image
+         source={require('../../assets/images/go-back.png')}
+         style={styles.backImg}
+       />
+      <Text style={{ fontSize: 14, fontWeight: '600', color: '#4F535A', fontFamily: 'Poppins_500Medium' }}>
+         Go Back
+       </Text>
+      </TouchableOpacity>
       <View style={styles.headerSection}>
         <ThemedText variant='preferenceTitle'>Set Your Preference</ThemedText>
         <ThemedText variant='subtitle'>Pick maximum of 3 categories.</ThemedText>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.bubbleContainer}>
-          {/* Row 1: Bike repair (left), Books (middle-UPPER-CIRCLE), Tools (right) */}
-          <View style={styles.bubbleRow}>
-            <TouchableOpacity
-              style={[styles.bubble, preferences[0].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[0].selected && selectedCount >= 2) return;
-                onToggle(preferences[0].id);
-              }}
-              activeOpacity={0.7}
+   <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+  <View style={styles.bubbleContainer}>
+    {Array.from({ length: Math.ceil(preferences.length / 3) }).map((_, rowIndex) => (
+      <View key={rowIndex} style={styles.bubbleRow}>
+        {preferences.slice(rowIndex * 3, rowIndex * 3 + 3).map((pref, colIndex) => (
+          <TouchableOpacity
+            key={pref.id}
+            style={[
+              colIndex === 1 ? styles.bubbleCircle : styles.bubble,
+              colIndex === 1 && styles.bubbleMiddle,
+              pref.selected && styles.bubbleSelected,
+            ]}
+            onPress={() => {
+              if (!pref.selected && selectedCount >= 3) return;
+              onToggle(pref.id);
+            }}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={[styles.bubbleText, pref.selected && styles.bubbleTextSelected]}
+              numberOfLines={2}
+              adjustsFontSizeToFit
+              minimumFontScale={0.6}
             >
-              <Text style={[styles.bubbleText, preferences[0].selected && styles.bubbleTextSelected]}>
-                {preferences[0].name}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.bubbleCircle, styles.bubbleMiddle, preferences[1].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[1].selected && selectedCount >= 2) return;
-                onToggle(preferences[1].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[1].selected && styles.bubbleTextSelected]}>
-                {preferences[1].name}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.bubble, preferences[2].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[2].selected && selectedCount >= 2) return;
-                onToggle(preferences[2].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[2].selected && styles.bubbleTextSelected]}>
-                {preferences[2].name}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Row 2: Clothes (left), PC repair (middle-UPPER-CIRCLE), Babysitting (right) */}
-          <View style={styles.bubbleRow}>
-            <TouchableOpacity
-              style={[styles.bubble, preferences[3].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[3].selected && selectedCount >= 2) return;
-                onToggle(preferences[3].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[3].selected && styles.bubbleTextSelected]}>
-                {preferences[3].name}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.bubbleCircle, styles.bubbleMiddle, preferences[4].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[4].selected && selectedCount >= 2) return;
-                onToggle(preferences[4].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[4].selected && styles.bubbleTextSelected]}>
-                {preferences[4].name}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.bubble, preferences[5].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[5].selected && selectedCount >= 2) return;
-                onToggle(preferences[5].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[5].selected && styles.bubbleTextSelected]}>
-                {preferences[5].name}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Row 3: Tutoring (left), Cleaning (middle-UPPER-CIRCLE), Surplus (right) */}
-          <View style={styles.bubbleRow}>
-            <TouchableOpacity
-              style={[styles.bubble, preferences[6].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[6].selected && selectedCount >= 2) return;
-                onToggle(preferences[6].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[6].selected && styles.bubbleTextSelected]}>
-                {preferences[6].name}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.bubbleCircle, styles.bubbleMiddle, preferences[7].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[7].selected && selectedCount >= 2) return;
-                onToggle(preferences[7].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[7].selected && styles.bubbleTextSelected]}>
-                {preferences[7].name}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.bubble, preferences[8].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[8].selected && selectedCount >= 2) return;
-                onToggle(preferences[8].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[8].selected && styles.bubbleTextSelected]}>
-                {preferences[8].name}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Row 4: Homemade dishes (left), Dry goods (middle-UPPER-CIRCLE), Small appliances (right) */}
-          <View style={styles.bubbleRow}>
-            <TouchableOpacity
-              style={[styles.bubble, preferences[9].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[9].selected && selectedCount >= 2) return;
-                onToggle(preferences[9].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[9].selected && styles.bubbleTextSelected]}>
-                {preferences[9].name}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.bubbleCircle, styles.bubbleMiddle, preferences[10].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[10].selected && selectedCount >= 2) return;
-                onToggle(preferences[10].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[10].selected && styles.bubbleTextSelected]}>
-                {preferences[10].name}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.bubble, preferences[11].selected && styles.bubbleSelected]}
-              onPress={() => {
-                if (!preferences[11].selected && selectedCount >= 2) return;
-                onToggle(preferences[11].id);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bubbleText, preferences[11].selected && styles.bubbleTextSelected]}>
-                {preferences[11].name}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
+              {pref.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    ))}
+  </View>
+</ScrollView>
 
       <View style={styles.fullWidthButtonWrapper}>
          <View style={styles.buttonContainer}>
@@ -203,11 +77,11 @@ const SetPreferences: React.FC<SetPreferencesProps> = ({ preferences, onToggle, 
           onPress={() => {
             const selected = preferences
              .filter((p) => p.selected)
-             .map((p) => p.name.toLowerCase());
+             .map((p) => p.name);
              setPreferences(selected);
              onContinue();
           }} 
-          disabled={selectedCount < 2} 
+          disabled={selectedCount < 1} 
           />
       </View>
       </View>
@@ -220,6 +94,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: SPACING.xl,
     backgroundColor: colors.surfacePage,
+  },
+  backRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingTop: SPACING.xl,
+    paddingBottom: 4,
+  },
+  backImg: {
+   width: 17.5,
+   height: 13.5,
   },
   headerSection: {
     paddingTop: SPACING.xl,
@@ -277,7 +162,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   bubbleText: {
-    fontSize: 14,                   
+    fontSize: 11,                   
     color: '#555965',
     fontWeight: '600',
     textAlign: 'center',
