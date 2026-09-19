@@ -52,3 +52,6 @@ app-example
 # personal notes
 note.md
 todo.md
+
+# Local Figma design cache
+figma/
