@@ -13,6 +13,7 @@ import { useAuthStore } from "./store/auth.store";
 import Toast from "react-native-toast-message";
 import { checkOnboardingStatus } from "./hooks/userProfile";
 import { QueryProvider } from "./providers/queryProvider";
+import AgentationDev from "./components/AgentationDev";
 
 
 
@@ -82,6 +83,7 @@ const RootLayout = () => {
         <Stack.Screen name="Dashboard/dashboard" options={{ headerShown: false  }} />
       </Stack>
        <Toast />
+       <AgentationDev />
      </AuthInitializer>
      </QueryProvider>
     </ThemeProvider>
