@@ -7,7 +7,8 @@
     "icon": "./assets/images/trocklyLogo.png",
     "platforms": [
       "android",
-      "ios"
+      "ios",
+      "web"
     ],
     "scheme": "trocklyapp",
     "userInterfaceStyle": "light",
