@@ -23,7 +23,7 @@ const { width, height } = Dimensions.get('window');
 const OnboardingScreen = () => {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const scrollViewRef = useRef(null);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const slides = [
     {
